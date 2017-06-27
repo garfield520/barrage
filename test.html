@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style type="text/css">
+   
+        body {
+            background: skyblue;
+        }
+
+        .video {
+            width: 500px;
+            height: 300px;
+            background: #333;
+            margin:30px auto 0 auto;
+        }
+
+        .cmt {
+            position: absolute;
+            color:#fff;
+            transition: transform 3s linear;
+            font-size: 24px;
+        }
+    </style>
+
+    <script>
+        function $ ( id ){
+            return document.getElementById(id);
+        }
+        window.onload = function (){
+            var oDiv = $('video');
+            var commentBox;
+            var l, t, w, h;
+            
+
+            l = oDiv.offsetLeft;
+            t = oDiv.offsetTop;
+            w = oDiv.offsetWidth;
+            h = oDiv.offsetHeight;
+
+            commentBox = document.createElement('div');
+            document.body.appendChild(commentBox);
+            commentBox.style.position = 'absolute'
+            commentBox.style.width = w + 'px';
+            commentBox.style.height = h + 'px';
+            commentBox.style.left = l + 'px';
+            commentBox.style.top = t + 'px';
+            commentBox.style.overflow = 'hidden';
+
+
+            
+
+            $('comment').onclick = function () {
+                
+                var commentBoxItem = document.createElement('div');
+                commentBoxItem.innerText = '一个新的弹幕';
+                commentBoxItem.className = 'cmt';
+                commentBox.appendChild(commentBoxItem);
+
+                var cWidth = commentBoxItem.offsetWidth;
+                commentBoxItem.style.left = w + 'px';
+                commentBoxItem.style.width = cWidth + 'px';
+                commentBoxItem.style.transform = 'translateX(-'+ (w + cWidth) +'px)';
+
+                commentBoxItem.addEventListener('transitionend', function (){
+                    console.log(1);
+                    commentBox.removeChild(commentBoxItem);
+                });
+
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="video" class="video"></div>
+    <button id="btn">transation</button>
+    <button id="comment">a comment</button>
+</body>
+</html>

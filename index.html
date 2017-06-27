@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style lang="">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #ccc;
+        }
+        .video {
+            width: 100%;
+            background: #444;
+            height:350px;
+        }
+    </style>
+
+    <script src="comment.js"></script>
+    <script>
+
+        window.onload = function () {
+
+            var commentBox = document.getElementById('video');
+            var comment = new Comment(commentBox);
+            comment.init({
+                fontSize: 2,
+                color: 'yellow'
+            });
+
+            document.getElementById('send').onclick = function (){
+                var data = {
+                    text: document.getElementById('commentInput').value,
+                    time: '',
+                    color: '#fff',
+                    fontSize: 1
+                }
+                comment.send(data);
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="video" class="video"></div>
+    <input id="commentInput" type="text" placeholder="弹幕内容" value="一条测试弹幕内容">
+    <button id="send">send</button>
+</body>
+</html>
