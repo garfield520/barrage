@@ -26,9 +26,9 @@
         window.onload = function () {
 
             var commentBox = document.getElementById('video');
-            var comment = new Comment(commentBox);
+            var comment = new CommentManager(commentBox);
             comment.init({
-                fontSize: 2,
+                fontSize: 20,
                 color: 'yellow'
             });
 
@@ -41,6 +41,14 @@
                 }
                 comment.send(data);
             }
+
+            document.getElementById('pause').onclick = function (){
+                comment.pause();
+            }
+
+            document.getElementById('resume').onclick = function (){
+                comment.resume();
+            }
         }
     </script>
 </head>
@@ -48,5 +56,7 @@
     <div id="video" class="video"></div>
     <input id="commentInput" type="text" placeholder="弹幕内容" value="一条测试弹幕内容">
     <button id="send">send</button>
+    <button id="pause">pause</button>
+    <button id="resume">resume</button>
 </body>
 </html>
