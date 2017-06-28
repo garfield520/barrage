@@ -12,12 +12,31 @@
         }
         body {
             background: #ccc;
-            padding-top:20px;
         }
         .video {
-            width: 100%;
-            background: #444;
-            height:350px;
+            /*background: #444;*/
+            text-align: center;
+            position: relative
+        }
+        #video {
+            margin:0 auto;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .play, .stop {
+            border: 1px solid #fff;
+            display: inline-block;
+            padding: 3px 5px;
+            cursor: pointer;
+            color: #fff;
+            position: absolute;
+            bottom: 10px;
+        }
+        .play {
+            left: 40%;
+        }
+        .stop {
+            left: 45%;
         }
     </style>
 
@@ -26,19 +45,47 @@
 
         window.onload = function () {
 
-            var commentBox = document.getElementById('video');
-            var cm = new CommentManager(commentBox);
+            var video = document.getElementById('video');
+            var width = video.offsetWidth;
+            var height = video.offsetHeight - 30;
+            var left = video.offsetLeft;
+            var top = video.offsetTop;
+
+            var isPlaying = false;
+
+            console.log(left, top)
+
+            var cm = new CommentManager();
             cm.init({
                 fontSize: 24,
                 color: 'yellow',
-                duration: '5'
+                duration: '5',
+                left: left,
+                top: top,
+                width: width,
+                height: height
             });
 
             cm.shadowEvent('click', function (){
-                console.log(123);
+                console.log(isPlaying);
+                if ( isPlaying ) {
+                    video.pause();
+                    isPlaying = false;
+                } else {
+                    video.play();
+                    showTime();
+                    isPlaying = true;
+                }
             });
 
             var timer;
+
+            function showTime (){
+                console.log('duration: ' + video.duration );
+                setInterval(function (){
+                    console.log(Math.ceil(video.currentTime));
+                }, 1000);
+            }
 
             function resume (){
                 timer = setInterval(function (){
@@ -58,6 +105,7 @@
                         '刷各种CP',
                         '6666',
                         '6666666666666666',
+                        '66666666666',
                         '2333333333333333333333'
                     ];
                     var data = {
@@ -66,7 +114,7 @@
                         fontSize: 24
                     }
                     cm.send(data);
-                }, 300);
+                }, 500);
             }
 
             document.getElementById('send').onclick = function (){
@@ -90,14 +138,25 @@
             }
 
             document.getElementById('auto').onclick = function (){
+                cm.resume();
                 resume();
+            }
+
+            document.getElementById('play').onclick = function (){
+                video.play();
+            }
+
+            document.getElementById('stop').onclick = function (){
+                video.pause();
             }
         }
     </script>
 </head>
 <body>
-    <div id="video" class="video">
-        <video src="oceans.mp4" autoplay loop width="100%"></video>
+    <div id="videoBox" class="video">
+        <video id="video" src="oceans.mp4" loop width="1000"></video>
+        <div id="play" class="play">play</div>
+        <div id="stop" class="stop">stop</div>
     </div>
     <hr>
     <input id="commentInput" type="text" placeholder="弹幕内容" value="一条测试弹幕内容">

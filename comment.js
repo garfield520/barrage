@@ -1,4 +1,4 @@
-//  suport IE9+ chrome firefox safari oprea
+//  suport IE10+
 function isObject ( obj ) {
     return Object.prototype.toString.call(obj) === '[object Object]';
 }
@@ -90,11 +90,13 @@ var Comment = (function (){
 var CommentManager = (function (){
     function CommentManager ( commentBox ) {
         //  base info of comment box
-        this.pos = {
-            l: commentBox.offsetLeft || 0,
-            t: commentBox.offsetTop || 0,
-            w: commentBox.offsetWidth || 0,
-            h: commentBox.offsetHeight || 0
+        if ( commentBox ) {
+            this.pos = {
+                l: commentBox.offsetLeft || 0,
+                t: commentBox.offsetTop || 0,
+                w: commentBox.offsetWidth || 0,
+                h: commentBox.offsetHeight || 0
+            }
         }
 
         this.CommentArray = [];
@@ -116,11 +118,25 @@ var CommentManager = (function (){
         }
         var commentBox = document.createElement('div');
         commentBox.style.position = 'absolute';
-        commentBox.style.left     = this.pos.l + 'px';
-        commentBox.style.top      = this.pos.t + 'px';
-        commentBox.style.width    = this.pos.w + 'px';
-        commentBox.style.height   = this.pos.h + 'px';
+        if ( this.pos ){
+            commentBox.style.left     = this.pos.l + 'px';
+            commentBox.style.top      = this.pos.t + 'px';
+            commentBox.style.width    = this.pos.w + 'px';
+            commentBox.style.height   = this.pos.h + 'px';
+        } else {
+            commentBox.style.left     = config.left + 'px';
+            commentBox.style.top      = config.top + 'px';
+            commentBox.style.width    = config.width + 'px';
+            commentBox.style.height   = config.height + 'px';
+            this.pos = {
+                l: config.left || 0,
+                t: config.top || 0,
+                w: config.width || 0,
+                h: config.height || 0
+            }
+        }
         commentBox.style.overflow = 'hidden';
+        
         //  test background color
         // commentBox.style.background = 'skyblue';
 
@@ -128,11 +144,15 @@ var CommentManager = (function (){
         this.commentBox = commentBox;
 
         //  computed rows of comment
-        var rows = Math.floor(this.pos.h/config.fontSize);
+        var rows = Math.floor(commentBox.offsetHeight/config.fontSize);
         this.rows = rows;
     }
 
     CommentManager.prototype.begin = function (){
+
+    }
+
+    CommentManager.prototype.resize = function (){
 
     }
 
@@ -168,9 +188,7 @@ var CommentManager = (function (){
     }
 
     CommentManager.prototype.shadowEvent = function ( event, fn ){
-        this.commentBox.addEventListener(event, function (){
-            fn()
-        });
+        this.commentBox.addEventListener(event, function ( event ){ fn( event ) });
     }
 
     return CommentManager;
