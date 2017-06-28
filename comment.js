@@ -4,38 +4,48 @@ function isObject ( obj ) {
 }
 
 var Comment = (function (){
-    function Comment ( commentInfo, commentBox, pos, config ) {
-        this.config      = config;
-        this.pos         = pos;
-        this.commentBox  = commentBox;
+    function Comment ( config ) {
+        //  commentInfo, commentBox, pos, config 
+        this.config       = config.config;
+        this.pos          = config.pos;
+        this.commentBox   = config.commentBox;
+        this.commentTime  = config.commentTime;
+        this.commentInfo  = config.commentInfo;
+        this.rows         = config.rows;
+        this.commentArray = config.commentArray;
         
         var comment  = document.createElement('div');
         this.Comment = comment;
+        comment.style.wordBreak = 'keep-all';
+        comment.style.display = 'block';
+        comment.style.whiteSpace = 'nowrap';
         comment.style.position = 'absolute';
-        commentBox.appendChild(comment);
+        this.commentBox.appendChild(comment);
 
-        comment.innerText = commentInfo.text;
-        comment.style.fontSize = '18px';
-        comment.style.color = '#fff';
+        comment.innerText = config.commentInfo.text;
+        comment.style.fontSize = this.commentInfo.fontSize + 'px';
+        comment.style.color = this.commentInfo.color;
         comment.style.width = comment.offsetWidth + 'px';
-        //  每个格间距
-        comment.style.top = 20 * Math.floor(Math.random() * 17) + 'px';
+        //  gap of every comment
+        comment.style.top = this.config.fontSize * Math.floor(Math.random() * this.rows) + 'px';
         
         var animationStyle = document.createElement('style');
         this.animationStyle = animationStyle;
+        //  A sigle animation name
+        this.animationName = 'commentScroll' + new Date().getTime();
         animationStyle.innerHTML = `
-            @keyframes commentScroll
+            @keyframes `+ this.animationName +`
                 {
-                    from {transform:translateX(`+ pos.w +`px);}
+                    from {transform:translateX(`+ this.pos.w +`px);}
                     to {transform:translateX(`+ (-comment.offsetWidth) +`px);}
                 }
                 @-webkit-keyframes commentScroll /* Safari and Chrome */
                 {
-                    from {transform:translateX(`+ pos.w +`px);}
+                    from {transform:translateX(`+ this.pos.w +`px);}
                     to {transform:translateX(`+ (-comment.offsetWidth) +`px);}
                 }
         `;
-        commentBox.appendChild(animationStyle);
+        this.commentBox.appendChild(animationStyle);
         //  If the comment is scroll comment;
         this.scroll();
     }
@@ -44,13 +54,21 @@ var Comment = (function (){
     Comment.prototype.scroll = function () {
         //  right 2 left
         var _this = this;
-        this.Comment.style.webkitAnimation = 'commentScroll '+ _this.config.duration +'s linear';
+        this.Comment.style.webkitAnimation = this.animationName + ' ' + _this.config.duration +'s linear';
 
-        //  When the comment leave from comment box at left
+        //  When the comment leave from comment box ast left
         //  rmove this commnet
         this.Comment.addEventListener('webkitAnimationEnd', function (){
             _this.commentBox.removeChild(_this.Comment);
             _this.commentBox.removeChild(_this.animationStyle);
+            
+            //  remove comment from comment array
+            _this.commentArray.map(function ( comment, index ){
+                if ( comment.time === _this.commentTime ) {
+                    _this.commentArray.splice(index, 1);
+                }
+            });
+            console.log(_this.commentArray);
         });
     }
 
@@ -83,7 +101,7 @@ var CommentManager = (function (){
 
         //  comment default config
         this.config = {
-            fontSize: 1,
+            fontSize: 20,
             color: '#fff',
             duration : '5'
         }
@@ -110,8 +128,8 @@ var CommentManager = (function (){
         this.commentBox = commentBox;
 
         //  computed rows of comment
-        var rows = Math.ceil(this.pos.h/config.fontSize);
-        console.log(rows);
+        var rows = Math.floor(this.pos.h/config.fontSize);
+        this.rows = rows;
     }
 
     CommentManager.prototype.begin = function (){
@@ -120,20 +138,38 @@ var CommentManager = (function (){
 
     //  send a comment
     CommentManager.prototype.send = function ( commentInfo ) {
-        var comment = new Comment( commentInfo, this.commentBox, this.pos, this.config );
-        this.CommentArray.push(comment);
-        console.log( this.CommentArray );
+        // var comment = new Comment( commentInfo, this.commentBox, this.pos, this.config );
+        var commentTime = new Date().getTime();
+        var comment = new Comment({
+            commentInfo: commentInfo,
+            commentBox: this.commentBox,
+            pos: this.pos,
+            config: this.config,
+            rows: this.rows,
+            commentTime: commentTime,
+            commentArray: this.CommentArray
+        });
+        this.CommentArray.push({
+            comment: comment,
+            time: commentTime
+        });
     }
 
     CommentManager.prototype.pause = function (){
-        this.CommentArray.map(function ( comment ){
-            comment.pause();
+        this.CommentArray.map(function ( commentInfo ){
+            commentInfo.comment.pause();
         });
     }
 
     CommentManager.prototype.resume = function (){
-        this.CommentArray.map(function ( comment ){
-            comment.resume();
+        this.CommentArray.map(function ( commentInfo ){
+            commentInfo.comment.resume();
+        });
+    }
+
+    CommentManager.prototype.shadowEvent = function ( event, fn ){
+        this.commentBox.addEventListener(event, function (){
+            fn()
         });
     }
 

@@ -12,6 +12,7 @@
         }
         body {
             background: #ccc;
+            padding-top:20px;
         }
         .video {
             width: 100%;
@@ -26,37 +27,83 @@
         window.onload = function () {
 
             var commentBox = document.getElementById('video');
-            var comment = new CommentManager(commentBox);
-            comment.init({
-                fontSize: 20,
-                color: 'yellow'
+            var cm = new CommentManager(commentBox);
+            cm.init({
+                fontSize: 24,
+                color: 'yellow',
+                duration: '5'
             });
+
+            cm.shadowEvent('click', function (){
+                console.log(123);
+            });
+
+            var timer;
+
+            function resume (){
+                timer = setInterval(function (){
+                    var testArr = [
+                        '前方高能预警',
+                        '请非战斗人员撤离',
+                        '前方臀控/足控/手控/娇【哔】喘等等福利',
+                        '说XX福利出来，我不打死你',
+                        '说XXX的憋走，带我一个',
+                        '这是一个有味道的视频或隔着屏幕我都闻到了味道',
+                        '看得我尴尬症都犯了',
+                        '如果XXX就是神作了',
+                        '违和感君已下线',
+                        '好像并没有什么不对',
+                        '请收下我（一年份）的膝盖',
+                        'UP主求BGM/图包/曲包',
+                        '刷各种CP',
+                        '6666',
+                        '6666666666666666',
+                        '2333333333333333333333'
+                    ];
+                    var data = {
+                        text: testArr[Math.floor(Math.random()*testArr.length)],
+                        color: ['red', '#fff', 'blue', 'yellow', 'green'][Math.floor(Math.random()*5)],
+                        fontSize: 24
+                    }
+                    cm.send(data);
+                }, 300);
+            }
 
             document.getElementById('send').onclick = function (){
                 var data = {
                     text: document.getElementById('commentInput').value,
                     time: '',
-                    color: '#fff',
-                    fontSize: 1
+                    color: 'white',
+                    fontSize: 24
                 }
-                comment.send(data);
+                cm.send(data);
             }
 
             document.getElementById('pause').onclick = function (){
-                comment.pause();
+                cm.pause();
+                clearInterval(timer);
             }
 
             document.getElementById('resume').onclick = function (){
-                comment.resume();
+                cm.resume();
+                resume();
+            }
+
+            document.getElementById('auto').onclick = function (){
+                resume();
             }
         }
     </script>
 </head>
 <body>
-    <div id="video" class="video"></div>
+    <div id="video" class="video">
+        <video src="oceans.mp4" autoplay loop width="100%"></video>
+    </div>
+    <hr>
     <input id="commentInput" type="text" placeholder="弹幕内容" value="一条测试弹幕内容">
     <button id="send">send</button>
     <button id="pause">pause</button>
     <button id="resume">resume</button>
+    <button id="auto">auto</button>
 </body>
 </html>
