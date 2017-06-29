@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div style="width:400px;height:300px;border:1px solid #000" id="info"></div>
+    <input type="text" id="inp">
+    <a href="javascript:sendMsg()">send msg</a>
+    <script>
+
+        var ws = new WebSocket('ws://localhost:3000');
+        ws.onopen = function (){
+            console.info('connection build successful');
+        }
+
+        ws.onmessage = function ( data ) {
+            console.log(data);
+            document.getElementById('info').innerHTML += data.data + '<br>';
+        }
+
+        function sendMsg () {
+            ws.send(document.getElementById('inp').value);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style lang="">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #ccc;
+        }
+        .video {
+            /*background: #444;*/
+            text-align: center;
+            position: relative
+        }
+        #video {
+            margin:0 auto;
+            cursor: pointer;
+        }
+        .play, .stop {
+            border: 1px solid #fff;
+            display: inline-block;
+            padding: 3px 5px;
+            cursor: pointer;
+            color: #fff;
+            position: absolute;
+            bottom: 10px;
+        }
+        .play {
+            left: 40%;
+        }
+        .stop {
+            left: 45%;
+        }
+    </style>
+
+    <script src="comment.js"></script>
+
+    <script>
+        window.onload = function () {
+            var video = $('video');
+            var width = video.offsetWidth;
+            var height = video.offsetHeight - 30;
+            var allComments;
+
+            var isPlaying = false;
+
+
+            var ws = new WebSocket('ws://localhost:3000');
+            ws.onopen = function (){
+                console.info('connection build successful');
+            }
+
+            ws.onmessage = function ( res ) {
+                var data = JSON.parse(res.data);
+                if ( Array.isArray(data) ) {
+                    allComments = data;
+                    console.log(data);
+                } else {
+                    cm.send(data);
+                }
+            }
+
+            video.onseeked = function (){
+                cm.clean();
+            }
+        
+            //  检测当前视频播放进度
+            function nowTime () {
+                var time = null;
+                video.ontimeupdate = function (){
+                    var currentTime = Math.round(video.currentTime);
+                    $('duration').innerHTML = currentTime + '/' + Math.round(video.duration);
+                    if ( time !== currentTime ) {
+                        time = currentTime;
+                        for ( var i = 0; i < allComments.length; i++ ) {
+                            if ( currentTime == allComments[i].time ) {
+                                cm.send(allComments[i]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            var cm = new CommentManager();
+            cm.init({
+                fontSize: 24,
+                color: 'yellow',
+                duration: '5',
+                left: video.offsetLeft,
+                top: video.offsetTop,
+                width: width,
+                height: height
+            });
+
+            cm.shadowEvent('click', function (){
+                if ( isPlaying ) {
+                    video.pause();
+                    cm.pause();
+                    isPlaying = false;
+                } else {
+                    video.play();
+                    nowTime();
+                    cm.resume();
+                    isPlaying = true;
+                }
+            });
+
+            $('send').onclick = function () {
+                var comment_text = $('commentInput').value;
+                var comment_color = $('comment_color').value;
+                var fontSize = 24;
+                var currentTime = $('video').currentTime;
+
+                var data = {
+                    fontSize:fontSize,
+                    text: comment_text,
+                    color: comment_color,
+                    time: Math.round(currentTime)
+                }
+                wsSend(data);
+            }
+
+            $('pause').onclick = function (){
+                cm.pause();
+                // clearInterval(timer);
+            }
+
+            function wsSend ( data ) {
+                ws.send(JSON.stringify(data));
+            }
+
+            function $ ( id ) {
+                return document.getElementById(id);
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="video">
+        <video id="video" src="oceans.mp4" controls loop width="100%"></video>
+    </div>
+    <hr>
+    <input id="commentInput" type="text" placeholder="弹幕内容" value="我是一条很长的弹幕">
+    <select name="" id="comment_color">
+        <option value="#fff">白色</option>
+        <option value="green">绿色</option>
+        <option value="red">红色</option>
+    </select>
+
+    <button id="send">send</button>
+    <button id="pause">pause</button>
+    <button id="resume">resume</button>
+    <button id="auto">auto</button>
+    <span id="duration"></span>
+</body>
+</html>
