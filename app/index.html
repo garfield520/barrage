@@ -57,12 +57,14 @@
             }
 
             ws.onmessage = function ( res ) {
-                var data = JSON.parse(res.data);
-                if ( Array.isArray(data) ) {
-                    allComments = data;
-                    console.log(data);
-                } else {
-                    cm.send(data);
+                if ( res.data ) {
+                    var data = JSON.parse(res.data);
+                    if ( Array.isArray(data) ) {
+                        allComments = data;
+                        console.log(data);
+                    } else {
+                        cm.send(data);
+                    }
                 }
             }
 
@@ -123,12 +125,8 @@
                     color: comment_color,
                     time: Math.round(currentTime)
                 }
+                cm.send(data);
                 wsSend(data);
-            }
-
-            $('pause').onclick = function (){
-                cm.pause();
-                // clearInterval(timer);
             }
 
             function wsSend ( data ) {
