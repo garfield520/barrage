@@ -44,9 +44,10 @@
     <script>
         window.onload = function () {
             var video = $('video');
+            var allComments;
+
             var width = video.offsetWidth;
             var height = video.offsetHeight - 30;
-            var allComments;
 
             var isPlaying = false;
 
@@ -141,7 +142,7 @@
 </head>
 <body>
     <div class="video">
-        <video id="video" src="oceans.mp4" controls loop width="100%"></video>
+        <video id="video" src="oceans.mp4" controls loop width="600" height="250"></video>
     </div>
     <hr>
     <input id="commentInput" type="text" placeholder="弹幕内容" value="我是一条很长的弹幕">

@@ -81,6 +81,7 @@ var Comment = (function (){
         console.log('paused');
         this.Comment.style.animationPlayState = 'paused';
         this.Comment.style.webkitAnimationPlayState = 'paused';
+        this.Comment.style.webkitAnimationPlayState = 'none !important';
     }
 
     Comment.prototype.resume = function (){
