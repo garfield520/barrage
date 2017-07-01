@@ -49,48 +49,11 @@
             }
         }
 
-        
-
-        // document.body.ontouchstart = function (){
-        //     log('start');
-        // }
-
-        // document.body.ontouchmove = function (){
-        //     log('move');
-        // }
-
-        var bd = document.body;
-        var btn = $('btn');
-
-        // bd.addEventListener('click', function (){
-        //     log(new Date().getTime() + ' :click' + '<br>');
-        //     log('<hr>');
-        // }, false);
-
-        // bd.addEventListener('touchstart', function (){
-        //     log(new Date().getTime() + ' :start' + '<br>');
-        // }, false);
-
-        bd.addEventListener('touchend', function (){
-            log(new Date().getTime() + ' :bd touchend' + '<br>');
-        }, false);
-
-        // bd.addEventListener('click', function (){
-        //     log(new Date().getTime() + ' :bd click' + '<br>');
-        // });
-
-        // btn.addEventListener('click', function ( e ){
-        //     e.cancelBubble = true;
-        //     log(new Date().getTime() + ' :click' + '<br>');
-        //     // log('<hr>');
-        // }, false);
-
-        // btn.addEventListener('touchend', function ( e ){
-        //     e.cancelBubble = true;
-        //     log(new Date().getTime() + ' :btn touchend' + '<br>');
-        //     // log('<hr>');
-        // }, false);
-
+        if ( WebSocket ) {
+            log(WebSocket);
+        } else {
+            log('this browser do not support websocket');
+        }
 
     </script>
 </body>
