@@ -6,7 +6,6 @@ const http = require('http');
 const url = require('url');
 const WebSocket = require('ws');
 const fs = require('fs');
-
 const app = express();
 
 app.use(express.static('./app'));
@@ -45,6 +44,6 @@ wss.on('connection', function connection(ws, req) {
     });
 });
 
-server.listen(3000, function listening() {
+server.listen(3001, function listening() {
     console.log('Listening on %d', server.address().port);
 });
