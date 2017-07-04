@@ -204,9 +204,5 @@ var CommentManager = (function (){
         this.commentBox.addEventListener(event, function ( event ){ fn( event ) });
     }
 
-    CommentManager.prototype.test = function (){
-        console.log(this.CommentArray.length);
-    }
-
     return CommentManager;
 })();
