@@ -102,8 +102,8 @@
 
             cm.shadowEvent('click', function (){
                 if ( isPlaying ) {
-                    video.pause();
                     cm.pause();
+                    video.pause();
                     isPlaying = false;
                 } else {
                     video.play();
@@ -112,6 +112,11 @@
                     isPlaying = true;
                 }
             });
+
+            $('opacityValue').onchange = function () {
+                var value = parseInt(this.value)/ 100;
+                cm.setStyles( value );
+            }
 
             $('send').onclick = function () {
                 
@@ -178,9 +183,11 @@
     </select>
 
     <button id="send">send</button>
-    <button id="pause">pause</button>
+    <!--<button id="pause">pause</button>
     <button id="resume">resume</button>
-    <button id="auto">auto</button>
+    <button id="auto">auto</button>-->
     <span id="duration"></span>
+    <hr>
+    <span>透明度：</span><input type="range" value="100" id="opacityValue">
 </body>
 </html>

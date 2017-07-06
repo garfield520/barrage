@@ -26,6 +26,11 @@ var Comment = (function (){
         comment.style.fontSize = this.commentInfo.fontSize + 'px';
         comment.style.color = this.commentInfo.color;
         comment.style.width = comment.offsetWidth + 'px';
+        //  opacity
+        // console.log(config.opacity);
+        if ( config.opacity || config.opacity === 0 ) {
+            comment.style.opacity = parseFloat(config.opacity);
+        }
         //  gap of every comment
         comment.style.top = this.config.fontSize * Math.floor(Math.random() * this.rows) + 'px';
         
@@ -88,6 +93,11 @@ var Comment = (function (){
         console.log('resume');
         this.Comment.style.animationPlayState = 'running';
         this.Comment.style.webkitAnimationPlayState = 'running';
+    }
+
+    //  set property of comment
+    Comment.prototype.setOpacity = function ( opacity ) {
+        this.Comment.style.opacity = parseFloat(opacity);
     }
 
     return Comment;
@@ -166,7 +176,7 @@ var CommentManager = (function (){
     CommentManager.prototype.send = function ( commentInfo ) {
         // var comment = new Comment( commentInfo, this.commentBox, this.pos, this.config );
         var commentTime = new Date().getTime();
-        var comment = new Comment({
+        var commentConfig = {
             commentInfo: commentInfo,
             commentBox: this.commentBox,
             pos: this.pos,
@@ -174,7 +184,12 @@ var CommentManager = (function (){
             rows: this.rows,
             commentTime: commentTime,
             commentArray: this.CommentArray
-        });
+        }
+        
+        if ( this.opacity || parseInt(this.opacity) == 0 ) {
+            commentConfig.opacity = this.opacity;
+        }
+        var comment = new Comment(commentConfig);
         this.CommentArray.push({
             comment: comment,
             time: commentTime
@@ -198,6 +213,16 @@ var CommentManager = (function (){
             commentInfo.comment.remove();
         });
         this.CommentArray = [];
+    }
+
+    //  set style of every comment
+    CommentManager.prototype.setStyles = function ( opacity ){
+        //  change opacity of the comment well appear
+        this.opacity = opacity;
+        //  change opacity of current comment
+        this.CommentArray.map(function ( commentInfo ){
+            commentInfo.comment.setOpacity( opacity );
+        });
     }
 
     CommentManager.prototype.shadowEvent = function ( event, fn ){

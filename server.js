@@ -44,6 +44,6 @@ wss.on('connection', function connection(ws, req) {
     });
 });
 
-server.listen(3001, function listening() {
+server.listen(3000, function listening() {
     console.log('Listening on %d', server.address().port);
 });
