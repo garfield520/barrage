@@ -216,7 +216,7 @@ var CommentManager = (function (){
     }
 
     //  set style of every comment
-    CommentManager.prototype.setStyles = function ( opacity ){
+    CommentManager.prototype.opacity = function ( opacity ){
         //  change opacity of the comment well appear
         this.opacity = opacity;
         //  change opacity of current comment
