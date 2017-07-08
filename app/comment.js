@@ -152,9 +152,6 @@ var CommentManager = (function (){
             }
         }
         commentBox.style.overflow = 'hidden';
-        
-        //  test background color
-        // commentBox.style.background = 'skyblue';
 
         document.body.appendChild(commentBox);  
         this.commentBox = commentBox;
