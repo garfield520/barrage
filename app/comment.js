@@ -26,6 +26,7 @@ var Comment = (function (){
         comment.style.fontSize = this.commentInfo.fontSize + 'px';
         comment.style.color = this.commentInfo.color;
         comment.style.width = comment.offsetWidth + 'px';
+
         //  opacity
         // console.log(config.opacity);
         if ( config.opacity || config.opacity === 0 ) {
@@ -61,8 +62,8 @@ var Comment = (function (){
         var _this = this;
         this.Comment.style.webkitAnimation = this.animationName + ' ' + _this.config.duration +'s linear';
 
-        //  When the comment leave from comment box ast left
-        //  rmove this commnet
+        //  When the comment leave from comment box at left
+        //  remove this commnet
         this.Comment.addEventListener('webkitAnimationEnd', function (){
             _this.commentBox.removeChild(_this.Comment);
             _this.commentBox.removeChild(_this.animationStyle);
@@ -108,9 +109,9 @@ var CommentManager = (function (){
         //  base info of comment box
         if ( commentBox ) {
             this.pos = {
-                l: commentBox.offsetLeft || 0,
-                t: commentBox.offsetTop || 0,
-                w: commentBox.offsetWidth || 0,
+                l: commentBox.offsetLeft   || 0,
+                t: commentBox.offsetTop    || 0,
+                w: commentBox.offsetWidth  || 0,
                 h: commentBox.offsetHeight || 0
             }
         }
@@ -212,7 +213,7 @@ var CommentManager = (function (){
         this.CommentArray = [];
     }
 
-    //  set style of every comment
+    //  set opacity of the comment
     CommentManager.prototype.opacity = function ( opacity ){
         //  change opacity of the comment well appear
         this.opacity = opacity;
