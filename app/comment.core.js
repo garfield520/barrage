@@ -13,7 +13,11 @@ var Comment = (function () {
         this.public_config = public_config;
         this.comment_config = comment_config;
         
-        this.init()
+        console.log(comment_config)
+        var comment = document.createElement('div');
+        Object.assign(comment.style, {
+            
+        })
     }
 
     Comment.prototype.init = function () {
@@ -72,7 +76,7 @@ var CommentManager = (function () {
             left: fSettings.comment_left + 'px',
             top: fSettings.comment_top + 'px',
             background: '#ccc',
-            overflow: 'hidden'
+            // overflow: 'hidden'
         });
         //  Append comment box to container
         //  Default - document.body
