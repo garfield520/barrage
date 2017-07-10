@@ -39,9 +39,20 @@
         
         var cm = new CommentManager(options);
 
-        send.onclick = function () {
-            
+
+        function sendcomment () {
+            var data = {
+                color: 'green',
+                fontSize: 20,
+                text: '一条弹幕一条弹幕'
+            }
+            cm.send(data);
         }
+
+        sendcomment()
+
+        send.onclick = sendcomment;
+
     </script>
 </body>
 </html>

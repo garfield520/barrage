@@ -8,6 +8,21 @@ function isObject ( obj ) {
     return Object.prototype.toString.call( obj ) === '[object Object]';
 }
 
+var Comment = (function () {
+    function Comment ( public_config, comment_config ) {
+        this.public_config = public_config;
+        this.comment_config = comment_config;
+        
+        this.init()
+    }
+
+    Comment.prototype.init = function () {
+        console.log( this.public_config );
+    }
+
+    return Comment;
+})();
+
 var CommentManager = (function () {
     function CommentManager ( options ) {
         //  Init settings
@@ -43,11 +58,12 @@ var CommentManager = (function () {
         Object.assign(default_settings, options);
         //  real settings of Comment
         var fSettings = default_settings;
+        this.fSettings = fSettings;
         
         //  Computed real rows of comment box
         this.rows = Math.floor(default_settings.comment_height / (default_settings.fontSize + 2));
         
-        //  create comment box
+        //  Create comment box
         var commentBox = document.createElement('div');
         Object.assign(commentBox.style, {
             position: 'absolute',
@@ -59,12 +75,21 @@ var CommentManager = (function () {
             overflow: 'hidden'
         });
         //  Append comment box to container
+        //  Default - document.body
         this.commentBox = commentBox;
         fSettings.container.appendChild(commentBox);
+        var comment_config = {
+            rows: this.rows
+        }
     }
 
     CommentManager.prototype.send = function ( comment_config ) {
-        
+        // console.log(comment_config);
+        var public_config = {
+            rows: this.rows,
+            commentBox: this.commentBox
+        }
+        var comment = new Comment(public_config, comment_config);
     }
 
     CommentManager.prototype.resize = function () {
