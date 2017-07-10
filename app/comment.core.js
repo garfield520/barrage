@@ -15,9 +15,13 @@ var Comment = (function () {
         
         console.log(comment_config)
         var comment = document.createElement('div');
+        comment.innerText = comment_config.text;
+
         Object.assign(comment.style, {
-            
+            fontSize: comment_config.fontSize + 'px',
+            color: comment_config.color
         })
+        return this;
     }
 
     Comment.prototype.init = function () {
@@ -89,11 +93,28 @@ var CommentManager = (function () {
 
     CommentManager.prototype.send = function ( comment_config ) {
         // console.log(comment_config);
+        this.comment_config = comment_config
         var public_config = {
             rows: this.rows,
             commentBox: this.commentBox
         }
-        var comment = new Comment(public_config, comment_config);
+        // var comment = new Comment(public_config, comment_config);
+        this._newComment();
+    }
+
+    CommentManager.prototype._newComment = function () {
+        var comment = document.createElement('div');
+        comment.innerText = this.comment_config.text;
+        
+        Object.assign(comment.style, {
+            position: 'absolute',
+            background: '#399',
+            display: 'block',
+            whiteSpace: 'nowrap'
+        });
+        //  test
+        this.commentBox.appendChild(comment);
+        comment.style.left = this.fSettings.comment_width + 'px';
     }
 
     CommentManager.prototype.resize = function () {
