@@ -24,6 +24,7 @@
     <hr>
     <button id="send">send</button>
     <button id="clear">clear</button>
+    <button id="pause">pause</button>
     <script>
         var demo = document.getElementById('demo');
         var send = document.getElementById('send')
@@ -40,7 +41,7 @@
             comment_top: _top,
             comment_width: _width,
             comment_height: _height,
-            duration: 5
+            duration: 4
         }
         
         var cm = new CommentManager(options);
@@ -60,7 +61,14 @@
         send.onclick = sendcomment;
 
         //  clear
-        document.getElementById('clear')
+        document.getElementById('clear').onclick = function () {
+            cm.clear();
+        }
+
+        //  pause
+        document.getElementById('pause').onclick = function () {
+            cm.pause();
+        }
 
     </script>
 </body>

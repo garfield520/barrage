@@ -4,32 +4,17 @@
  * version 0.0.2
  */
 
+/**
+ * 1、暂停
+ * 2、透明度
+ * 3、清除
+ * 4、遮罩点击事件
+ * 5、继续
+ */
+
 function isObject ( obj ) {
     return Object.prototype.toString.call( obj ) === '[object Object]';
 }
-
-var Comment = (function () {
-    function Comment ( public_config, comment_config ) {
-        this.public_config = public_config;
-        this.comment_config = comment_config;
-        
-        console.log(comment_config)
-        var comment = document.createElement('div');
-        comment.innerText = comment_config.text;
-
-        Object.assign(comment.style, {
-            fontSize: comment_config.fontSize + 'px',
-            color: comment_config.color
-        })
-        return this;
-    }
-
-    Comment.prototype.init = function () {
-        console.log( this.public_config );
-    }
-
-    return Comment;
-})();
 
 var CommentManager = (function () {
     function CommentManager ( options ) {
@@ -101,17 +86,40 @@ var CommentManager = (function () {
                 to {transform:translateX(`+ (- this.fSettings.comment_width - comment.offsetWidth) +`px);}
             }
         `;
+        this.commentArray.push(comment)
         this.commentBox.appendChild(animationStyle);
-        comment.style.webkitAnimation = 'name 10s linear';
+        comment.style.webkitAnimation = 'name '+ this.fSettings.duration +'s linear';
+        console.log( this.commentArray )
         
         //  Add event listener to animation
         comment.addEventListener('webkitAnimationEnd', function () {
+            _this.commentArray.shift();
             _this.commentBox.removeChild(comment);
         });
     }
 
+    CommentManager.prototype.pause = function () {
+        var classObj = {
+            '-webkit-animation': 'none !important'
+        }
+        this.commentArray.map(function ( commnet, index ) {
+            commnet.style.animationPlayState = 'paused';
+            commnet.style.webkitAnimationPlayState = 'paused';
+            commnet.style.webkitAnimationPlayState = 'none !important';
+            comment.style.webkitAnimation = 'none !important';
+        });
+        // this.Comment.style.animationPlayState = 'paused';
+        // this.Comment.style.webkitAnimationPlayState = 'paused';
+        // this.Comment.style.webkitAnimationPlayState = 'none !important';
+    }
+
     CommentManager.prototype.clear = function () {
-        this.commentBox.innerText = '';
+        console.log( this.commentArray )
+        // this.commentBox.innerText = '';
+    }
+
+    CommentManager.prototype._setComment = function () {
+
     }
 
     CommentManager.prototype._newComment = function () {
@@ -121,7 +129,7 @@ var CommentManager = (function () {
         
         Object.assign(comment.style, {
             position: 'absolute',
-            background: '#399',
+            // background: '#399',
             display: 'block',
             whiteSpace: 'nowrap',
             left: this.fSettings.comment_width + 'px',
