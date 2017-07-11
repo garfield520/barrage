@@ -2,23 +2,28 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <script src="comment.core.js"></script>
     <style lang="">
         #demo {
-            width: 400px;
-            height: 200px;
+            width: 300px;
+            height: 100px;
             border: 1px solid #000;
+            margin: 0 auto;
         }
     </style>
     
 </head>
 <body>
+    <br>
+    <br>
+    <br>    
     <div id="demo"></div>
     <hr>
     <button id="send">send</button>
+    <button id="clear">clear</button>
     <script>
         var demo = document.getElementById('demo');
         var send = document.getElementById('send')
@@ -34,7 +39,8 @@
             comment_left: _left,
             comment_top: _top,
             comment_width: _width,
-            comment_height: _height
+            comment_height: _height,
+            duration: 5
         }
         
         var cm = new CommentManager(options);
@@ -52,6 +58,9 @@
         sendcomment()
 
         send.onclick = sendcomment;
+
+        //  clear
+        document.getElementById('clear')
 
     </script>
 </body>

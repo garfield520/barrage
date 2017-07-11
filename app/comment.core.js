@@ -57,7 +57,8 @@ var CommentManager = (function () {
         var default_settings = {
             fontSize: 18,
             color: '#ffffff',
-            container: document.body
+            container: document.body,
+            duration: 5
         }
         if ( options.container ) {
             options.container = document.getElementById(options.container);
@@ -86,35 +87,48 @@ var CommentManager = (function () {
         //  Default - document.body
         this.commentBox = commentBox;
         fSettings.container.appendChild(commentBox);
-        var comment_config = {
-            rows: this.rows
-        }
     }
 
     CommentManager.prototype.send = function ( comment_config ) {
-        // console.log(comment_config);
-        this.comment_config = comment_config
-        var public_config = {
-            rows: this.rows,
-            commentBox: this.commentBox
-        }
-        // var comment = new Comment(public_config, comment_config);
-        this._newComment();
+        var _this = this;
+        this.comment_config = comment_config;
+        var comment = this._newComment();
+        this.commentBox.appendChild(comment);
+        var animationStyle = document.createElement('style');
+        animationStyle.innerText = `
+            @keyframes name {
+                from {transform:translateX(`+ 0 +`px);}
+                to {transform:translateX(`+ (- this.fSettings.comment_width - comment.offsetWidth) +`px);}
+            }
+        `;
+        this.commentBox.appendChild(animationStyle);
+        comment.style.webkitAnimation = 'name 10s linear';
+        
+        //  Add event listener to animation
+        comment.addEventListener('webkitAnimationEnd', function () {
+            _this.commentBox.removeChild(comment);
+        });
+    }
+
+    CommentManager.prototype.clear = function () {
+        this.commentBox.innerText = '';
     }
 
     CommentManager.prototype._newComment = function () {
         var comment = document.createElement('div');
         comment.innerText = this.comment_config.text;
+        var commentRows = Math.floor(Math.random() * this.rows) * this.fSettings.fontSize;
         
         Object.assign(comment.style, {
             position: 'absolute',
             background: '#399',
             display: 'block',
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
+            left: this.fSettings.comment_width + 'px',
+            top: commentRows + 'px'
         });
-        //  test
-        this.commentBox.appendChild(comment);
-        comment.style.left = this.fSettings.comment_width + 'px';
+        
+        return comment;
     }
 
     CommentManager.prototype.resize = function () {
