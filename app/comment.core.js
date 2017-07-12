@@ -141,7 +141,7 @@ var CommentManager = (function () {
     }
 
     CommentManager.prototype._setComment = function () {
-
+        
     }
 
     CommentManager.prototype._newComment = function ( comment_config ) {
