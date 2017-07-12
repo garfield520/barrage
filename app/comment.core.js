@@ -66,7 +66,7 @@ var CommentManager = (function () {
             left: fSettings.comment_left + 'px',
             top: fSettings.comment_top + 'px',
             background: '#ccc',
-            // overflow: 'hidden'
+            overflow: 'hidden'
         });
         //  Append comment box to container
         //  Default - document.body
@@ -79,10 +79,14 @@ var CommentManager = (function () {
         var comment = this._newComment(comment_config);
         this.commentArray.push(comment);
         this.commentBox.appendChild(comment);
+        var totalWidth = this.totalWidth = comment.offsetWidth + this.fSettings.comment_width;
+
+        //  判断弹幕形式
+        
         Velocity(comment, {
-            translateX: '-430px'
+            translateX: '-'+ totalWidth +'px'
         }, {
-            duration: 4000,
+            duration: _this.fSettings.duration * 1000,
             easing: 'linear',
             complete: function () {
                 _this.commentBox.removeChild(comment);
@@ -94,27 +98,27 @@ var CommentManager = (function () {
         });
     }
 
+    //  弹幕状态（暂停/运行）
     CommentManager.prototype.isPaused = false;
 
     CommentManager.prototype.pause = function () {
-        if ( !this.isPaused ) {
+        if ( !this.isPaused && this.commentArray.length != 0 ) {
+            console.log('pause');
             this.isPaused = true;
-            this.commentArray.map(function ( comment, index ) {
-                var tempcur = comment.style.transform;
-                comment.currentPosition = tempcur.substring(11, tempcur.length - 1);
-                console.log(comment.currentPosition);            
+            this.commentArray.map(function ( comment, index ) {          
                 Velocity(comment, 'stop');
             });
         }
-    }   
+    }
 
     CommentManager.prototype.resume = function () {
         var _this = this;
         if ( this.isPaused ) {
+            console.log('resume');
             this.isPaused = false;
             this.commentArray.map(function ( comment, index ) {
                 Velocity(comment, {
-                    translateX: '-430px'
+                    translateX: '-'+ _this.totalWidth +'px'
                 }, {
                     duration: comment.remaining,
                     easing: 'linear',
@@ -122,7 +126,6 @@ var CommentManager = (function () {
                         comment.remaining = remaining;
                     },
                     complete: function () {
-                        console.log(comment)
                         if ( comment ) {
                             _this.commentArray.shift();
                             _this.commentBox.removeChild(comment);
@@ -134,7 +137,7 @@ var CommentManager = (function () {
     }
 
     CommentManager.prototype.clear = function () {
-        
+        console.log( this.commentArray )
     }
 
     CommentManager.prototype._setComment = function () {
@@ -142,7 +145,6 @@ var CommentManager = (function () {
     }
 
     CommentManager.prototype._newComment = function ( comment_config ) {
-
         //  Create a comment
         var comment = document.createElement('div');
         comment.innerText = comment_config.text;
@@ -150,9 +152,9 @@ var CommentManager = (function () {
         comment.style.fontSize = comment_config.fontSize;
         comment.style.display = 'inline-block';
         comment.style.position = 'absolute';
-        comment.style.left = this.fSettings.comment_width + 'px';
         comment.style.whiteSpace = 'nowrap';
-        comment.style.background = 'skyblue';
+        comment.style.left = this.fSettings.comment_width + 'px';
+        comment.style.top = this.fSettings.fontSize * Math.round(this.rows * Math.random()) + 'px';
         
         return comment;
     }
