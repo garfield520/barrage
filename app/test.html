@@ -9,28 +9,34 @@
     <script src="https://cdn.bootcss.com/velocity/1.5.0/velocity.js"></script>
     <script src="comment.core.js"></script>
     <style lang="">
+        body {
+            background: skyblue
+        }
         #demo {
-            width: 800px;
-            height: 450px;
+            width: 600px;
+            height: 350px;
             border: 1px solid #000;
             margin: 0 auto;
         }
         .no-animation {
             -webkit-animation: none !important;
         }
+        button {
+            padding: 10px;
+        }
     </style>
     
 </head>
 <body>
     <br>
-    <br>
-    <br>    
     <div id="demo"></div>
     <hr>
     <button id="send">send</button>
     <button id="clear">clear</button>
     <button id="pause">pause</button>
     <button id="resume">resume</button>
+    <button id="setOpacity">setOpacity</button>
+    <input type="range" id="range">
     <script>
         var demo = document.getElementById('demo');
         var send = document.getElementById('send')
@@ -55,10 +61,29 @@
 
 
         function sendcomment () {
+            var text = [
+                '前方高能预警',
+                '请非战斗人员撤离',
+                '前方臀控',
+                '说XX福利出来，我不打死你',
+                '说XXX的憋走，带我一个',
+                '这是一个有味道的视频',
+                '这是一个有味道的视频或隔着屏幕我都闻到了味道',
+                '看得我尴尬症都犯了',
+                '隔壁XXX过来的',
+                '打卡',
+                '这不科学',
+                '如果XXX就是神作了',
+                '6666',
+                '233333333333',
+                'XXX俺嫁或者XXX嫁我和XXX是我的或除了XXX都给你或XXX是我的或XXX在我床',
+                '请收下我（一年份）的膝盖或给跪了'
+            ][Math.floor(Math.random()*16)];
+
             var data = {
-                color: 'green',
-                fontSize: 30,
-                text: '一条弹幕一条弹幕'
+                color: '#fff',
+                fontSize: 25,
+                text: text
             }
             cm.send(data);
         }
@@ -80,6 +105,12 @@
         //  resume
         document.getElementById('resume').onclick = function () {
             cm.resume();
+        }
+
+        //  透明度
+        document.getElementById('range').onchange = function () {
+            var opacity = parseInt(this.value) / 100;
+            cm.setOpacity(opacity);
         }
 
     </script>

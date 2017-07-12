@@ -65,7 +65,7 @@ var CommentManager = (function () {
             height: fSettings.comment_height + 'px',
             left: fSettings.comment_left + 'px',
             top: fSettings.comment_top + 'px',
-            background: '#ccc',
+            background: '#000',
             overflow: 'hidden'
         });
         //  Append comment box to container
@@ -79,7 +79,7 @@ var CommentManager = (function () {
         var comment = this._newComment(comment_config);
         this.commentArray.push(comment);
         this.commentBox.appendChild(comment);
-        var totalWidth = this.totalWidth = comment.offsetWidth + this.fSettings.comment_width;
+        var totalWidth = comment.offsetWidth + this.fSettings.comment_width;
 
         //  判断弹幕形式
         
@@ -94,6 +94,7 @@ var CommentManager = (function () {
             },
             progress: function (elements, complete, remaining, start, tweenValue) {
                 comment.remaining = remaining;
+                comment.totalWidth = totalWidth;
             }
         });
     }
@@ -105,7 +106,7 @@ var CommentManager = (function () {
         if ( !this.isPaused && this.commentArray.length != 0 ) {
             console.log('pause');
             this.isPaused = true;
-            this.commentArray.map(function ( comment, index ) {          
+            this.commentArray.map(function ( comment, index ) {
                 Velocity(comment, 'stop');
             });
         }
@@ -118,7 +119,7 @@ var CommentManager = (function () {
             this.isPaused = false;
             this.commentArray.map(function ( comment, index ) {
                 Velocity(comment, {
-                    translateX: '-'+ _this.totalWidth +'px'
+                    translateX: '-'+ comment.totalWidth +'px'
                 }, {
                     duration: comment.remaining,
                     easing: 'linear',
@@ -136,6 +137,17 @@ var CommentManager = (function () {
         }
     }
 
+    CommentManager.prototype.setOpacity = function ( opacity ) {
+        //  已存在屏幕上弹幕透明度
+        this.commentArray.map(function ( comment, index ) {
+            comment.style.opacity = opacity;
+        });
+        console.log( this.fSettings );
+        //  未插入弹幕透明度
+        this.fSettings.opacity = opacity;
+        console.log( this.fSettings );
+    }
+
     CommentManager.prototype.clear = function () {
         console.log( this.commentArray )
     }
@@ -149,12 +161,19 @@ var CommentManager = (function () {
         var comment = document.createElement('div');
         comment.innerText = comment_config.text;
         comment.style.color = comment_config.color;
-        comment.style.fontSize = comment_config.fontSize;
+        comment.style.fontSize = comment_config.fontSize + 'px';
+        comment.style.fontWeight = 'bold';
         comment.style.display = 'inline-block';
         comment.style.position = 'absolute';
         comment.style.whiteSpace = 'nowrap';
+        comment.style.fontFamily = 'SimHei, "Microsoft JhengHei", Arial, Helvetica, sans-serif';
+        comment.style.textShadow = 'rgb(0, 0, 0) 1px 0px 1px, rgb(0, 0, 0) 0px 1px 1px, rgb(0, 0, 0) 0px -1px 1px, rgb(0, 0, 0) -1px 0px 1px';
         comment.style.left = this.fSettings.comment_width + 'px';
         comment.style.top = this.fSettings.fontSize * Math.round(this.rows * Math.random()) + 'px';
+        //  透明度
+        if ( this.fSettings.opacity || this.fSettings.opacity === 0 ) {
+            comment.style.opacity = this.fSettings.opacity;
+        }
         
         return comment;
     }
