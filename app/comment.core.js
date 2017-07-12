@@ -76,65 +76,83 @@ var CommentManager = (function () {
 
     CommentManager.prototype.send = function ( comment_config ) {
         var _this = this;
-        this.comment_config = comment_config;
-        var comment = this._newComment();
+        var comment = this._newComment(comment_config);
+        this.commentArray.push(comment);
         this.commentBox.appendChild(comment);
-        var animationStyle = document.createElement('style');
-        animationStyle.innerText = `
-            @keyframes name {
-                from {transform:translateX(`+ 0 +`px);}
-                to {transform:translateX(`+ (- this.fSettings.comment_width - comment.offsetWidth) +`px);}
+        Velocity(comment, {
+            translateX: '-430px'
+        }, {
+            duration: 4000,
+            easing: 'linear',
+            complete: function () {
+                _this.commentBox.removeChild(comment);
+                _this.commentArray.shift();
+            },
+            progress: function (elements, complete, remaining, start, tweenValue) {
+                comment.remaining = remaining;
             }
-        `;
-        this.commentArray.push(comment)
-        this.commentBox.appendChild(animationStyle);
-        comment.style.webkitAnimation = 'name '+ this.fSettings.duration +'s linear';
-        console.log( this.commentArray )
-        
-        //  Add event listener to animation
-        comment.addEventListener('webkitAnimationEnd', function () {
-            _this.commentArray.shift();
-            _this.commentBox.removeChild(comment);
         });
     }
 
+    CommentManager.prototype.isPaused = false;
+
     CommentManager.prototype.pause = function () {
-        var classObj = {
-            '-webkit-animation': 'none !important'
+        if ( !this.isPaused ) {
+            this.isPaused = true;
+            this.commentArray.map(function ( comment, index ) {
+                var tempcur = comment.style.transform;
+                comment.currentPosition = tempcur.substring(11, tempcur.length - 1);
+                console.log(comment.currentPosition);            
+                Velocity(comment, 'stop');
+            });
         }
-        this.commentArray.map(function ( commnet, index ) {
-            commnet.style.animationPlayState = 'paused';
-            commnet.style.webkitAnimationPlayState = 'paused';
-            commnet.style.webkitAnimationPlayState = 'none !important';
-            comment.style.webkitAnimation = 'none !important';
-        });
-        // this.Comment.style.animationPlayState = 'paused';
-        // this.Comment.style.webkitAnimationPlayState = 'paused';
-        // this.Comment.style.webkitAnimationPlayState = 'none !important';
+    }   
+
+    CommentManager.prototype.resume = function () {
+        var _this = this;
+        if ( this.isPaused ) {
+            this.isPaused = false;
+            this.commentArray.map(function ( comment, index ) {
+                Velocity(comment, {
+                    translateX: '-430px'
+                }, {
+                    duration: comment.remaining,
+                    easing: 'linear',
+                    progress: function (elements, complete, remaining, start, tweenValue) {
+                        comment.remaining = remaining;
+                    },
+                    complete: function () {
+                        console.log(comment)
+                        if ( comment ) {
+                            _this.commentArray.shift();
+                            _this.commentBox.removeChild(comment);
+                        }
+                    }
+                });
+            });
+        }
     }
 
     CommentManager.prototype.clear = function () {
-        console.log( this.commentArray )
-        // this.commentBox.innerText = '';
+        
     }
 
     CommentManager.prototype._setComment = function () {
 
     }
 
-    CommentManager.prototype._newComment = function () {
+    CommentManager.prototype._newComment = function ( comment_config ) {
+
+        //  Create a comment
         var comment = document.createElement('div');
-        comment.innerText = this.comment_config.text;
-        var commentRows = Math.floor(Math.random() * this.rows) * this.fSettings.fontSize;
-        
-        Object.assign(comment.style, {
-            position: 'absolute',
-            // background: '#399',
-            display: 'block',
-            whiteSpace: 'nowrap',
-            left: this.fSettings.comment_width + 'px',
-            top: commentRows + 'px'
-        });
+        comment.innerText = comment_config.text;
+        comment.style.color = comment_config.color;
+        comment.style.fontSize = comment_config.fontSize;
+        comment.style.display = 'inline-block';
+        comment.style.position = 'absolute';
+        comment.style.left = this.fSettings.comment_width + 'px';
+        comment.style.whiteSpace = 'nowrap';
+        comment.style.background = 'skyblue';
         
         return comment;
     }

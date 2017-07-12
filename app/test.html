@@ -5,6 +5,8 @@
     <meta content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" name="viewport">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    
+    <script src="https://cdn.bootcss.com/velocity/1.5.0/velocity.js"></script>
     <script src="comment.core.js"></script>
     <style lang="">
         #demo {
@@ -12,6 +14,9 @@
             height: 100px;
             border: 1px solid #000;
             margin: 0 auto;
+        }
+        .no-animation {
+            -webkit-animation: none !important;
         }
     </style>
     
@@ -25,6 +30,7 @@
     <button id="send">send</button>
     <button id="clear">clear</button>
     <button id="pause">pause</button>
+    <button id="resume">resume</button>
     <script>
         var demo = document.getElementById('demo');
         var send = document.getElementById('send')
@@ -68,6 +74,11 @@
         //  pause
         document.getElementById('pause').onclick = function () {
             cm.pause();
+        }
+
+        //  resume
+        document.getElementById('resume').onclick = function () {
+            cm.resume();
         }
 
     </script>
