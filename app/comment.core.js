@@ -43,7 +43,8 @@ var CommentManager = (function () {
             fontSize: 18,
             color: '#ffffff',
             container: document.body,
-            duration: 5
+            duration: 5,
+            duration_top: 3
         }
         if ( options.container ) {
             options.container = document.getElementById(options.container);
@@ -55,7 +56,7 @@ var CommentManager = (function () {
         this.fSettings = fSettings;
         
         //  Computed real rows of comment box
-        this.rows = Math.floor(default_settings.comment_height / (default_settings.fontSize + 2));
+        this.rows = Math.floor(default_settings.comment_height / (default_settings.fontSize));
         
         //  Create comment box
         var commentBox = document.createElement('div');
@@ -66,7 +67,8 @@ var CommentManager = (function () {
             left: fSettings.comment_left + 'px',
             top: fSettings.comment_top + 'px',
             background: '#000',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            zIndex: '1'
         });
         //  Append comment box to container
         //  Default - document.body
@@ -74,29 +76,45 @@ var CommentManager = (function () {
         fSettings.container.appendChild(commentBox);
     }
 
+    //  顶部/底部弹幕存储
+    CommentManager.prototype.top_bottom_comment = {
+        top: [],
+        bottom: []
+    }
+
     CommentManager.prototype.send = function ( comment_config ) {
         var _this = this;
-        var comment = this._newComment(comment_config);
-        this.commentArray.push(comment);
+        var commentObj = this._newComment(comment_config);
+        var comment = commentObj.comment;
+        var position = commentObj.position;
         this.commentBox.appendChild(comment);
-        var totalWidth = comment.offsetWidth + this.fSettings.comment_width;
 
-        //  判断弹幕形式
-        
-        Velocity(comment, {
-            translateX: '-'+ totalWidth +'px'
-        }, {
-            duration: _this.fSettings.duration * 1000,
-            easing: 'linear',
-            complete: function () {
+        //  滚动弹幕
+        if ( !position ) {
+            this.commentArray.push(comment);
+            var totalWidth = comment.offsetWidth + this.fSettings.comment_width;
+            Velocity(comment, {
+                translateX: '-'+ totalWidth +'px'
+            }, {
+                duration: _this.fSettings.duration * 1000,
+                easing: 'linear',
+                complete: function () {
+                    _this.commentBox.removeChild(comment);
+                    _this.commentArray.shift();
+                },
+                progress: function (elements, complete, remaining, start, tweenValue) {
+                    comment.remaining = remaining;
+                    comment.totalWidth = totalWidth;
+                }
+            });
+        } else if ( position === 'top' ) {
+            this.top_bottom_comment.top.push( comment );
+            setTimeout(function () {
                 _this.commentBox.removeChild(comment);
-                _this.commentArray.shift();
-            },
-            progress: function (elements, complete, remaining, start, tweenValue) {
-                comment.remaining = remaining;
-                comment.totalWidth = totalWidth;
-            }
-        });
+                _this.top_bottom_comment.top.shift();
+            }, _this.fSettings.duration_top * 1000);
+        }
+
     }
 
     //  弹幕状态（暂停/运行）
@@ -142,10 +160,16 @@ var CommentManager = (function () {
         this.commentArray.map(function ( comment, index ) {
             comment.style.opacity = opacity;
         });
-        console.log( this.fSettings );
+        //  顶部弹幕
+        this.top_bottom_comment.top.map(function ( comment ) {
+            comment.style.opacity = opacity;
+        });
+        //  底部弹幕
+        this.top_bottom_comment.bottom.map(function ( comment ) {
+            comment.style.opacity = opacity;
+        });
         //  未插入弹幕透明度
         this.fSettings.opacity = opacity;
-        console.log( this.fSettings );
     }
 
     CommentManager.prototype.clear = function () {
@@ -157,25 +181,41 @@ var CommentManager = (function () {
     }
 
     CommentManager.prototype._newComment = function ( comment_config ) {
+        var position;
+
         //  Create a comment
         var comment = document.createElement('div');
-        comment.innerText = comment_config.text;
-        comment.style.color = comment_config.color;
-        comment.style.fontSize = comment_config.fontSize + 'px';
-        comment.style.fontWeight = 'bold';
-        comment.style.display = 'inline-block';
-        comment.style.position = 'absolute';
-        comment.style.whiteSpace = 'nowrap';
-        comment.style.fontFamily = 'SimHei, "Microsoft JhengHei", Arial, Helvetica, sans-serif';
-        comment.style.textShadow = 'rgb(0, 0, 0) 1px 0px 1px, rgb(0, 0, 0) 0px 1px 1px, rgb(0, 0, 0) 0px -1px 1px, rgb(0, 0, 0) -1px 0px 1px';
-        comment.style.left = this.fSettings.comment_width + 'px';
-        comment.style.top = this.fSettings.fontSize * Math.round(this.rows * Math.random()) + 'px';
+        //  base settings
         //  透明度
         if ( this.fSettings.opacity || this.fSettings.opacity === 0 ) {
             comment.style.opacity = this.fSettings.opacity;
         }
-        
-        return comment;
+        comment.innerText = comment_config.text;
+        comment.style.color = comment_config.color;
+        comment.style.fontSize = comment_config.fontSize + 'px';
+        comment.style.fontWeight = 'bold';
+        comment.style.fontFamily = 'SimHei, "Microsoft JhengHei", Arial, Helvetica, sans-serif';
+        comment.style.textShadow = 'rgb(0, 0, 0) 1px 0px 1px, rgb(0, 0, 0) 0px 1px 1px, rgb(0, 0, 0) 0px -1px 1px, rgb(0, 0, 0) -1px 0px 1px';
+        comment.style.whiteSpace = 'nowrap';
+
+        //  滚动弹幕
+        if ( !comment_config.position || comment_config.position === 'scroll' ) {
+            position = '';
+            comment.style.display = 'inline-block';
+            comment.style.position = 'absolute';
+            comment.style.left = this.fSettings.comment_width + 'px';
+            comment.style.top = this.fSettings.fontSize * Math.round(this.rows * Math.random()) + 'px';
+        } else if ( comment_config.position === 'top' ) {
+            position = 'top';
+            comment.style.display = 'block';
+            comment.style.width = '100%';
+            comment.style.textAlign = 'center';
+        }
+
+        return {
+            comment: comment,
+            position: position
+        }
     }
 
     CommentManager.prototype.resize = function () {
