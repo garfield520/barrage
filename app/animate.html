@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style lang="">
+        .demo {
+            width: 100px;
+            height: 100px;
+            background: #399;
+            position: absolute;
+            left: 500px;
+        }
+        button {
+            position: absolute;
+            top: 200px;
+        }
+        #run {
+            left: 30px;
+        }
+        #stop {
+            left: 90px;
+        }
+        #continue {
+            left: 150px;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo" id="demo"></div>
+    <button id="run">run</button>
+    <button id="stop">stop</button>
+    <button id="continue">continue</button>
+
+    <script>
+
+        (function () {
+            var timerId = 0;
+
+            function stopAnimate ( id ) {
+                cancelAnimationFrame( id );
+            }   
+
+            function animate ( elem, destination, config ) {
+                var isFirstTime = true;
+                var lastTime = 0;
+                var startTime = 0;
+                var passedDistance = 0;
+                var NUMREG = /\d+\.\d+/
+                var direction = destination < 0 ? '-' : '';
+                var passed;
+                var srcStyle = false;
+                
+
+                if ( elem.style.transform ) {
+                    srcStyle = true;
+                    passedDistance = parseFloat(NUMREG.exec(elem.style.transform)[0]);
+                    passed = parseFloat(NUMREG.exec(elem.style.transform)[0]);
+                }
+                
+                requestAnimationFrame(_loop);
+                function _loop ( t ) {
+                    if ( isFirstTime ) {
+                        lastTime = startTime = t;
+                        isFirstTime = false;
+                        requestAnimationFrame(_loop);
+                    } else {
+                        var totalTime = config.duration;
+                        var timeInterval = t - lastTime;
+                        var totalDistance = Math.abs(destination);
+                        var step = (srcStyle ? (totalDistance - passed) : totalDistance) / totalTime * timeInterval;
+                        var passedTime = t - startTime;
+                        
+                        lastTime = t;
+                        passedDistance += step;
+                        config.progress( passedTime, passedDistance );
+                        Math.abs(passedDistance - totalDistance) < step && (passedDistance = totalDistance);
+                        if ( parseInt(passedDistance) <= totalDistance ) {
+                            elem.style.transform = 'translateX('+ direction + passedDistance +'px)';
+                            timerId = requestAnimationFrame(_loop);
+                        } else {
+                            // console.log( 'Animation ended' );
+                        }
+                    }
+                }
+            }
+            //================================================
+            var demo = document.getElementById('demo');
+            var runBtn = document.getElementById('run');
+            var stopBtn = document.getElementById('stop');
+            var continueBtn = document.getElementById('continue');
+
+            var duration = 3000;
+            var destination = -500;
+
+            var passedTime = 0;
+            var passedDistance = 0;
+
+            runBtn.onclick = function () {
+                animate(demo, destination, {
+                    duration: duration,
+                    progress: function ( _passedTime, _passedDistance ) {
+                        passedTime = _passedTime;
+                        passedDistance = _passedDistance;
+                    },
+                    complete: function () {
+                        
+                    }
+                });
+            }
+
+            stopBtn.onclick = function () {
+                stopAnimate(timerId);
+                console.log(passedTime);
+            }
+
+            continueBtn.onclick = function () {
+                console.log(passedDistance - destination);
+                console.log(duration - passedTime);
+                animate(demo, destination, {
+                    duration: duration - passedTime,
+                    progress: function ( _passedTime, _passedDistance ) {
+                        passedTime = _passedTime;
+                        passedDistance = _passedDistance;
+                    },
+                    complete: function () {
+
+                    }
+                });
+            }
+        })();
+        
+        
+
+    </script>
+
+    <script>
+        
+    </script>
+</body>
+</html>
