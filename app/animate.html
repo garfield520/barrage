@@ -61,6 +61,7 @@
                 }
                 
                 requestAnimationFrame(_loop);
+
                 function _loop ( t ) {
                     if ( isFirstTime ) {
                         lastTime = startTime = t;
@@ -86,7 +87,9 @@
                     }
                 }
             }
+
             //================================================
+            
             var demo = document.getElementById('demo');
             var runBtn = document.getElementById('run');
             var stopBtn = document.getElementById('stop');
