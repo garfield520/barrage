@@ -18,10 +18,6 @@ function isObject ( obj ) {
     return Object.prototype.toString.call( obj ) === '[object Object]';
 }
 
-function cacelAnimate ( id ) {
-    cancelAnimationFrame( id );
-}
-
 function animate ( elem, toDestance, config ) {
     var isFirstTime     = true,
         totalTime       = config.duration,
