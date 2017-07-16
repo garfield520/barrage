@@ -12,7 +12,26 @@
  * 5、继续
  */
 
-var timerId = 0;
+var rAF = (function () {
+    return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        // if all else fails, use setTimeout
+        function (callback) {
+            return window.setTimeout(callback, 1000 / 60); // shoot for 60 fps
+        };
+})();
+
+var cancelrAF  = (function () {
+    return window.cancelAnimationFrame ||
+        window.webkitCancelAnimationFrame ||
+        window.mozCancelAnimationFrame ||
+        window.oCancelAnimationFrame ||
+        function (id) {
+            window.clearTimeout(id);
+        };
+ })();
 
 function isObject ( obj ) {
     return Object.prototype.toString.call( obj ) === '[object Object]';
@@ -48,7 +67,7 @@ function animate ( elem, toDestance, config ) {
         if ( isFirstTime ) {
             startTime = lastTime = t;
             isFirstTime = false;
-            requestAnimationFrame( _loop );
+            rAF( _loop );
         } else {
 
             timeInterval = t - lastTime;
@@ -66,7 +85,7 @@ function animate ( elem, toDestance, config ) {
             }
 
             if ( Math.abs(passedDistance) < Math.abs(totalDistance) ) {
-                elem.timerId = requestAnimationFrame(_loop)
+                elem.timerId = rAF(_loop)
             } else {
                 currentPosition = totalDistance;
                 elem.style.transform = 'translateX(' + toDestance +'px)';
@@ -74,7 +93,7 @@ function animate ( elem, toDestance, config ) {
             }
         }
     }
-    requestAnimationFrame( _loop );
+    rAF( _loop );
 }
 
 var CommentManager = (function () {
@@ -158,7 +177,7 @@ var CommentManager = (function () {
             var totalWidth = comment.offsetWidth + this.fSettings.comment_width;
 
             var endPosition = comment.endPosition = -totalWidth;
-            var duration = 5000;
+            var duration = this.fSettings.duration * 1000;
             comment.totalTime = duration;
             animate(comment, endPosition, {
                 duration: duration,
@@ -189,7 +208,7 @@ var CommentManager = (function () {
             console.log('pause');
             this.isPaused = true;
             this.commentArray.map(function ( comment, index ) {
-                cancelAnimationFrame(comment.timerId);
+                cancelrAF(comment.timerId);
             });
         }
     }
