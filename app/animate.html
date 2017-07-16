@@ -12,6 +12,7 @@
             background: #399;
             position: absolute;
             left: 500px;
+            /* transform: translateX(-100px);    */
         }
         button {
             position: absolute;
@@ -35,107 +36,110 @@
     <button id="continue">continue</button>
 
     <script>
-
-        (function () {
-            var timerId = 0;
-
-            function stopAnimate ( id ) {
-                cancelAnimationFrame( id );
-            }   
-
-            function animate ( elem, destination, config ) {
-                var isFirstTime = true;
-                var lastTime = 0;
-                var startTime = 0;
-                var passedDistance = 0;
-                var NUMREG = /\d+\.\d+/
-                var direction = destination < 0 ? '-' : '';
-                var passed;
-                var srcStyle = false;
-                
-
-                if ( elem.style.transform ) {
-                    srcStyle = true;
-                    passedDistance = parseFloat(NUMREG.exec(elem.style.transform)[0]);
-                    passed = parseFloat(NUMREG.exec(elem.style.transform)[0]);
-                }
-                
-                requestAnimationFrame(_loop);
-
-                function _loop ( t ) {
-                    if ( isFirstTime ) {
-                        lastTime = startTime = t;
-                        isFirstTime = false;
-                        requestAnimationFrame(_loop);
-                    } else {
-                        var totalTime = config.duration;
-                        var timeInterval = t - lastTime;
-                        var totalDistance = Math.abs(destination);
-                        var step = (srcStyle ? (totalDistance - passed) : totalDistance) / totalTime * timeInterval;
-                        var passedTime = t - startTime;
-                        
-                        lastTime = t;
-                        passedDistance += step;
-                        config.progress( passedTime, passedDistance );
-                        Math.abs(passedDistance - totalDistance) < step && (passedDistance = totalDistance);
-                        if ( parseInt(passedDistance) <= totalDistance ) {
-                            elem.style.transform = 'translateX('+ direction + passedDistance +'px)';
-                            timerId = requestAnimationFrame(_loop);
-                        } else {
-                            // console.log( 'Animation ended' );
-                        }
-                    }
-                }
-            }
-
-            //================================================
-            
-            var demo = document.getElementById('demo');
-            var runBtn = document.getElementById('run');
-            var stopBtn = document.getElementById('stop');
-            var continueBtn = document.getElementById('continue');
-
-            var duration = 3000;
-            var destination = -500;
-
-            var passedTime = 0;
+        
+        var timerId = 0;
+        
+        function animate ( elem, toDestance, config ) {
+            var isFirstTime = true;
+            //  动画开始时间点
+            var startTime = 0;
+            //  时间间隔
+            var timeInterval = 0;
+            //  上次一帧动画执行时间点
+            var lastTime = 0;
+            //  每帧动画运动步长
+            var step = 0;
+            //  总距离
+            var totalDistance = 0;
+            //  总时间(ms)
+            var totalTime = config.duration;
+            //  当前位置
+            var currentPosition = 0;
+            //  方向
+            var directive = '';
+            //  经过的距离
             var passedDistance = 0;
+            
+            var currentTransform = getComputedStyle(elem).transform;
+            if ( currentTransform == 'none' ) {
+                totalDistance = parseFloat(toDestance);
+            } else {
+                currentPosition = parseFloat(currentTransform.substring(10, currentTransform.length - 1).split(',')[3]);
+                totalDistance = parseFloat(toDestance) - currentPosition;
+            }
+            if ( totalDistance <= 0 ) {
+                directive = '-';
+            }
 
-            runBtn.onclick = function () {
-                animate(demo, destination, {
-                    duration: duration,
-                    progress: function ( _passedTime, _passedDistance ) {
-                        passedTime = _passedTime;
-                        passedDistance = _passedDistance;
-                    },
-                    complete: function () {
-                        
+            requestAnimationFrame( _loop );
+
+            function _loop ( t ) {
+                if ( isFirstTime ) {
+                    startTime = lastTime = t;
+                    isFirstTime = false;
+                    requestAnimationFrame( _loop );
+                } else {
+                    //  每帧动画时间间隔
+                    timeInterval = t - lastTime;
+                    //  记录本帧动画执行时间点
+                    lastTime = t;
+
+                    step = totalDistance / totalTime * timeInterval;
+                    currentPosition += step;
+                    passedDistance += step;
+                    
+                    elem.style.transform = 'translateX(' + currentPosition +'px)';
+                    if ( Math.abs(passedDistance) < Math.abs(totalDistance) ) {
+                        requestAnimationFrame(_loop)
+                    } else {
+                        currentPosition = totalDistance;
+                        elem.style.transform = 'translateX(' + toDestance +'px)';
+                        console.log('Animation ended');
                     }
-                });
+                }
             }
+        }
 
-            stopBtn.onclick = function () {
-                stopAnimate(timerId);
-                console.log(passedTime);
-            }
-
-            continueBtn.onclick = function () {
-                console.log(passedDistance - destination);
-                console.log(duration - passedTime);
-                animate(demo, destination, {
-                    duration: duration - passedTime,
-                    progress: function ( _passedTime, _passedDistance ) {
-                        passedTime = _passedTime;
-                        passedDistance = _passedDistance;
-                    },
-                    complete: function () {
-
-                    }
-                });
-            }
-        })();
+        //================================================
         
-        
+        var demo = document.getElementById('demo');
+        var runBtn = document.getElementById('run');
+        var stopBtn = document.getElementById('stop');
+        var continueBtn = document.getElementById('continue');
+
+        var duration = 3000;
+        var destination = -500;
+
+        var passedTime = 0;
+        var passedDistance = 0;
+
+        runBtn.onclick = function () {
+            animate(demo, destination, {
+                duration: duration,
+                progress: function ( _passedTime, _passedDistance ) {
+                    
+                },
+                complete: function () {
+                    
+                }
+            });
+        }
+
+        stopBtn.onclick = function () {
+            stopAnimate(timerId);
+        }
+
+        continueBtn.onclick = function () {
+            animate(demo, destination, {
+                duration: duration - passedTime,
+                progress: function ( _passedTime, _passedDistance ) {
+                    
+                },
+                complete: function () {
+
+                }
+            });
+        }
 
     </script>
 
