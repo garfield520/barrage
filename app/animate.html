@@ -38,6 +38,10 @@
     <script>
         
         var timerId = 0;
+
+        function cacelAnimate ( id ) {
+            cancelAnimationFrame( id );
+        }
         
         function animate ( elem, toDestance, config ) {
             var isFirstTime = true;
@@ -59,6 +63,8 @@
             var directive = '';
             //  经过的距离
             var passedDistance = 0;
+            //  经过的时间
+            var passedTime = 0;
             
             var currentTransform = getComputedStyle(elem).transform;
             if ( currentTransform == 'none' ) {
@@ -70,6 +76,9 @@
             if ( totalDistance <= 0 ) {
                 directive = '-';
             }
+            
+            // console.log('总距离：' + totalDistance);
+            // console.log('总时间：' + totalTime);
 
             requestAnimationFrame( _loop );
 
@@ -87,14 +96,18 @@
                     step = totalDistance / totalTime * timeInterval;
                     currentPosition += step;
                     passedDistance += step;
+                    passedTime = t - startTime;
                     
                     elem.style.transform = 'translateX(' + currentPosition +'px)';
+
+                    config.progress( passedTime, Math.abs(passedDistance) );
+
                     if ( Math.abs(passedDistance) < Math.abs(totalDistance) ) {
-                        requestAnimationFrame(_loop)
+                        timerId = requestAnimationFrame(_loop)
                     } else {
                         currentPosition = totalDistance;
                         elem.style.transform = 'translateX(' + toDestance +'px)';
-                        console.log('Animation ended');
+                        config.complete();
                     }
                 }
             }
@@ -113,38 +126,40 @@
         var passedTime = 0;
         var passedDistance = 0;
 
+        var totalTime = duration;
+
         runBtn.onclick = function () {
             animate(demo, destination, {
                 duration: duration,
                 progress: function ( _passedTime, _passedDistance ) {
-                    
+                    passedTime = _passedTime;
+                    passedDistance = _passedDistance;
                 },
                 complete: function () {
-                    
+                    console.log('animation ended')
                 }
             });
         }
 
         stopBtn.onclick = function () {
-            stopAnimate(timerId);
+            cacelAnimate(timerId);
         }
-
+        
         continueBtn.onclick = function () {
+            totalTime = totalTime - passedTime;
+            console.log(totalTime);
             animate(demo, destination, {
-                duration: duration - passedTime,
+                duration: totalTime,
                 progress: function ( _passedTime, _passedDistance ) {
-                    
+                    passedTime = _passedTime;
+                    passedDistance = _passedDistance;
                 },
                 complete: function () {
-
+                    console.log('animation ended')
                 }
             });
         }
 
-    </script>
-
-    <script>
-        
     </script>
 </body>
 </html>
