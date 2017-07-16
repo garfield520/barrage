@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     
-    <script src="https://cdn.bootcss.com/velocity/1.5.0/velocity.js"></script>
+     <!-- <script src="https://cdn.bootcss.com/velocity/1.5.0/velocity.js"></script>  -->
     <script src="comment.core.js"></script>
     <style lang="">
         body {
@@ -17,6 +17,7 @@
             height: 350px;
             border: 1px solid #000;
             margin: 0 auto;
+            position: relative
         }
         .no-animation {
             -webkit-animation: none !important;
@@ -80,7 +81,7 @@
                 '请收下我（一年份）的膝盖或给跪了'
             ][Math.floor(Math.random()*16)];
 
-            var position = ['top', ''][Math.round(Math.random())];
+            var position = ['', ''][Math.round(Math.random())];
 
             var data = {
                 color: '#fff',
@@ -88,6 +89,8 @@
                 text: text,
                 position: position
             }
+
+            
             cm.send(data);
         }
 

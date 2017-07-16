@@ -9,14 +9,15 @@
         .demo {
             width: 100px;
             height: 100px;
-            background: #399;
             position: absolute;
-            left: 500px;
+            left: 700px;
+            color:#000;
+            font-weight: bold;
+            font-size: 25px;
             /* transform: translateX(-100px);    */
         }
         button {
             position: absolute;
-            top: 200px;
         }
         #run {
             left: 30px;
@@ -27,10 +28,24 @@
         #continue {
             left: 150px;
         }
+        .testDiv {
+            white-space: nowrap;
+            height: 100px;
+            position: absolute;
+        }
+        .cbox {
+            width: 500px;
+            height: 300px;
+            background: #ccc;
+            margin:0 auto;
+            position: relative;
+            overflow: hidden
+        }
     </style>
 </head>
 <body>
-    <div class="demo" id="demo"></div>
+    <!-- <div class="demo" id="demo">来啊</div> -->
+    <div id="cbox" class="cbox"></div>
     <button id="run">run</button>
     <button id="stop">stop</button>
     <button id="continue">continue</button>
@@ -120,45 +135,87 @@
         var stopBtn = document.getElementById('stop');
         var continueBtn = document.getElementById('continue');
 
-        var duration = 3000;
-        var destination = -500;
-
-        var passedTime = 0;
-        var passedDistance = 0;
-
-        var totalTime = duration;
+        
 
         runBtn.onclick = function () {
+
+            var oDiv = document.createElement('div');
+            oDiv.innerHTML = [
+                '前方高能预警',
+                '请非战斗人员撤离',
+                '前方臀控',
+                '说XX福利出来，我不打死你',
+                '说XXX的憋走，带我一个',
+                '这是一个有味道的视频',
+                '这是一个有味道的视频或隔着屏幕我都闻到了味道',
+                '看得我尴尬症都犯了',
+                '隔壁XXX过来的',
+                '打卡',
+                '这不科学',
+                '如果XXX就是神作了',
+                '6666',
+                '233333333333',
+                'XXX俺嫁或者XXX嫁我和XXX是我的或除了XXX都给你或XXX是我的或XXX在我床',
+                '请收下我（一年份）的膝盖或给跪了'
+            ][Math.floor(Math.random()*16)];
+            oDiv.className = 'testDiv';
+            oDiv.style.left = 500 + 'px';
+            oDiv.style.top = Math.round(Math.random() * 300) + 'px';
+            document.getElementById('cbox').appendChild(oDiv);
+
+
+            oDiv.duration = 5000;
+            oDiv.destination = -500 + (-oDiv.offsetWidth);
+            // oDiv.passedTime = 0;
+            // oDiv.passedDistance = 0;
+
+            animate(oDiv, oDiv.destination, {
+                duration: oDiv.duration,
+                progress: function ( _passedTime, _passedDistance ) {
+                    oDiv.passedTime = _passedTime;
+                },
+                complete: function () {
+                    console.log('animation ended')
+                }
+            });
+
+            return;
+            var duration = 5000;
+            var destination = -692;
+            var passedTime = 0;
+            var passedDistance = 0;
+
+            var totalTime = duration;
+            
             animate(demo, destination, {
                 duration: duration,
                 progress: function ( _passedTime, _passedDistance ) {
                     passedTime = _passedTime;
-                    passedDistance = _passedDistance;
                 },
                 complete: function () {
                     console.log('animation ended')
                 }
             });
+
+            stopBtn.onclick = function () {
+                cacelAnimate(timerId);
+            }
+            
+            continueBtn.onclick = function () {
+                totalTime = totalTime - passedTime;
+                animate(demo, destination, {
+                    duration: totalTime,
+                    progress: function ( _passedTime, _passedDistance ) {
+                        passedTime = _passedTime;
+                    },
+                    complete: function () {
+                        console.log('animation ended')
+                    }
+                });
+            }
         }
 
-        stopBtn.onclick = function () {
-            cacelAnimate(timerId);
-        }
         
-        continueBtn.onclick = function () {
-            totalTime = totalTime - passedTime;
-            console.log(totalTime);
-            animate(demo, destination, {
-                duration: totalTime,
-                progress: function ( _passedTime, _passedDistance ) {
-                    passedTime = _passedTime;
-                    passedDistance = _passedDistance;
-                },
-                complete: function () {
-                    console.log('animation ended')
-                }
-            });
-        }
 
     </script>
 </body>

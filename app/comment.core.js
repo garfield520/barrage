@@ -12,14 +12,81 @@
  * 5、继续
  */
 
+var timerId = 0;
+
 function isObject ( obj ) {
     return Object.prototype.toString.call( obj ) === '[object Object]';
 }
 
+function cacelAnimate ( id ) {
+    cancelAnimationFrame( id );
+}
+
+function animate ( elem, toDestance, config ) {
+    var isFirstTime     = true,
+        totalTime       = config.duration,
+        directive       = '',
+        startTime       = 0,
+        timeInterval    = 0,
+        lastTime        = 0,
+        step            = 0,
+        totalDistance   = 0,
+        currentPosition = 0,
+        passedDistance  = 0,
+        passedTime      = 0;
+    
+    var currentTransform = getComputedStyle(elem).transform;
+    
+    if ( currentTransform == 'none' ) {
+        totalDistance = parseFloat(toDestance);
+    } else {
+        currentPosition = parseFloat(currentTransform.substring(10, currentTransform.length - 1).split(',')[3]);
+        totalDistance = parseFloat(toDestance) - currentPosition;
+    }
+    
+    if ( totalDistance <= 0 ) {
+        directive = '-';
+    }
+
+    function _loop ( t ) {
+        if ( isFirstTime ) {
+            startTime = lastTime = t;
+            isFirstTime = false;
+            requestAnimationFrame( _loop );
+        } else {
+
+            timeInterval = t - lastTime;
+            lastTime = t;
+            
+            step = totalDistance / totalTime * timeInterval;
+            
+            currentPosition += step;
+            passedDistance += step;
+            passedTime = t - startTime;
+            elem.style.transform = 'translateX(' + currentPosition +'px)';
+
+            if ( config.progress ) {
+                config.progress( passedTime );
+            }
+
+            if ( Math.abs(passedDistance) < Math.abs(totalDistance) ) {
+                elem.timerId = requestAnimationFrame(_loop)
+            } else {
+                currentPosition = totalDistance;
+                elem.style.transform = 'translateX(' + toDestance +'px)';
+                config.complete && config.complete();
+            }
+        }
+    }
+    requestAnimationFrame( _loop );
+}
+
 var CommentManager = (function () {
     function CommentManager ( options ) {
-        //  Init settings
-        //  Judge if the options is a JS object, to call init function or throw Error
+        /**
+         * Init settings
+         * Judge if the options is a JS object, to call init function or throw Error
+         */
         if ( isObject(options) ) {
             if ( !options.comment_top || !options.comment_left || !options.comment_width || !options.comment_height ) {
                 throw new Error('The position infomation of CommentBox must be transferd')
@@ -93,18 +160,19 @@ var CommentManager = (function () {
         if ( !position ) {
             this.commentArray.push(comment);
             var totalWidth = comment.offsetWidth + this.fSettings.comment_width;
-            Velocity(comment, {
-                translateX: '-'+ totalWidth +'px'
-            }, {
-                duration: _this.fSettings.duration * 1000,
-                easing: 'linear',
+
+            var endPosition = comment.endPosition = -totalWidth;
+            var duration = 5000;
+            comment.totalTime = duration;
+            animate(comment, endPosition, {
+                duration: duration,
+                progress: function ( _passedTime, _passedDistance ) {
+                    comment.passedTime = _passedTime;
+                },
                 complete: function () {
                     _this.commentBox.removeChild(comment);
                     _this.commentArray.shift();
-                },
-                progress: function (elements, complete, remaining, start, tweenValue) {
-                    comment.remaining = remaining;
-                    comment.totalWidth = totalWidth;
+                    console.log('Animation ended');
                 }
             });
         } else if ( position === 'top' ) {
@@ -125,7 +193,7 @@ var CommentManager = (function () {
             console.log('pause');
             this.isPaused = true;
             this.commentArray.map(function ( comment, index ) {
-                Velocity(comment, 'stop');
+                cancelAnimationFrame(comment.timerId);
             });
         }
     }
@@ -136,19 +204,16 @@ var CommentManager = (function () {
             console.log('resume');
             this.isPaused = false;
             this.commentArray.map(function ( comment, index ) {
-                Velocity(comment, {
-                    translateX: '-'+ comment.totalWidth +'px'
-                }, {
-                    duration: comment.remaining,
-                    easing: 'linear',
-                    progress: function (elements, complete, remaining, start, tweenValue) {
-                        comment.remaining = remaining;
+                comment.totalTime = comment.totalTime - comment.passedTime;
+                
+                animate(comment, comment.endPosition, {
+                    duration: comment.totalTime,
+                    progress: function ( _passedTime, _passedDistance ) {
+                        comment.passedTime = _passedTime;
                     },
                     complete: function () {
-                        if ( comment ) {
-                            _this.commentArray.shift();
-                            _this.commentBox.removeChild(comment);
-                        }
+                        _this.commentBox.removeChild(comment);
+                        _this.commentArray.shift();
                     }
                 });
             });
