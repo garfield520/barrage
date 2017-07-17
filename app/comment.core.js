@@ -152,13 +152,15 @@ var CommentManager = (function () {
             overflow: 'hidden',
             zIndex: '1'
         });
-        //  Append comment box to container
-        //  Default - document.body
+        /**
+         * Append comment box to container
+         * Default - document.body
+         */
         this.commentBox = commentBox;
         fSettings.container.appendChild(commentBox);
     }
 
-    //  顶部/底部弹幕存储
+    //  Array of top and bottom comment
     CommentManager.prototype.top_bottom_comment = {
         top: [],
         bottom: []
@@ -171,7 +173,7 @@ var CommentManager = (function () {
         var position = commentObj.position;
         this.commentBox.appendChild(comment);
 
-        //  滚动弹幕
+        //  srcroll comment
         if ( !position ) {
             this.commentArray.push(comment);
             var totalWidth = comment.offsetWidth + this.fSettings.comment_width;
@@ -200,7 +202,7 @@ var CommentManager = (function () {
 
     }
 
-    //  弹幕状态（暂停/运行）
+    //  State of comment(run/pause)
     CommentManager.prototype.isPaused = false;
 
     CommentManager.prototype.pause = function () {
@@ -236,19 +238,19 @@ var CommentManager = (function () {
     }
 
     CommentManager.prototype.setOpacity = function ( opacity ) {
-        //  已存在屏幕上弹幕透明度
+        //  Opacity of comment exists
         this.commentArray.map(function ( comment, index ) {
             comment.style.opacity = opacity;
         });
-        //  顶部弹幕
+        //  Top comment
         this.top_bottom_comment.top.map(function ( comment ) {
             comment.style.opacity = opacity;
         });
-        //  底部弹幕
+        //  Bottom comment
         this.top_bottom_comment.bottom.map(function ( comment ) {
             comment.style.opacity = opacity;
         });
-        //  未插入弹幕透明度
+        //  Opacity of comment to be append later
         this.fSettings.opacity = opacity;
     }
 
@@ -263,10 +265,11 @@ var CommentManager = (function () {
     CommentManager.prototype._newComment = function ( comment_config ) {
         var position;
 
-        //  Create a comment
+        /**
+         * Create a comment and set base styles
+         * Opacity
+         */
         var comment = document.createElement('div');
-        //  base settings
-        //  透明度
         if ( this.fSettings.opacity || this.fSettings.opacity === 0 ) {
             comment.style.opacity = this.fSettings.opacity;
         }
@@ -278,7 +281,7 @@ var CommentManager = (function () {
         comment.style.textShadow = 'rgb(0, 0, 0) 1px 0px 1px, rgb(0, 0, 0) 0px 1px 1px, rgb(0, 0, 0) 0px -1px 1px, rgb(0, 0, 0) -1px 0px 1px';
         comment.style.whiteSpace = 'nowrap';
 
-        //  滚动弹幕
+        //  Scroll comment
         if ( !comment_config.position || comment_config.position === 'scroll' ) {
             position = '';
             comment.style.display = 'inline-block';
