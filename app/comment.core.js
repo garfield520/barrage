@@ -258,7 +258,7 @@ var CommentManager = (function () {
         console.log( this.commentArray )
     }
 
-    CommentManager.prototype._setComment = function () {
+    CommentManager.prototype.setComment = function () {
         
     }
 
