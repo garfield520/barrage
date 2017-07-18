@@ -13,7 +13,8 @@
  */
 
 var rAF = (function () {
-    return window.requestAnimationFrame ||
+    return
+        window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
         window.mozRequestAnimationFrame ||
         window.oRequestAnimationFrame ||
@@ -24,7 +25,8 @@ var rAF = (function () {
 })();
 
 var cancelrAF  = (function () {
-    return window.cancelAnimationFrame ||
+    return
+        window.cancelAnimationFrame ||
         window.webkitCancelAnimationFrame ||
         window.mozCancelAnimationFrame ||
         window.oCancelAnimationFrame ||
@@ -69,7 +71,6 @@ function animate ( elem, toDestance, config ) {
             isFirstTime = false;
             rAF( _loop );
         } else {
-
             timeInterval = t - lastTime;
             lastTime = t;
             
