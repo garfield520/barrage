@@ -31,7 +31,7 @@
             };
     })();
 
-    var cancelrAF  = (function () {
+    var cancelrAF = (function () {
         return
             window.cancelAnimationFrame ||
             window.webkitCancelAnimationFrame ||
