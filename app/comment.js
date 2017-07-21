@@ -169,6 +169,10 @@ var CommentManager = (function (){
     CommentManager.prototype.resize = function (){
 
     }
+	
+	CommentManager.prototype.distroy = function () {
+		
+	}
 
     //  send a comment
     CommentManager.prototype.send = function ( commentInfo ) {
