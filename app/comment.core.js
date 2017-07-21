@@ -200,7 +200,6 @@ var CommentManager = (function () {
                 _this.top_bottom_comment.top.shift();
             }, _this.fSettings.duration_top * 1000);
         }
-
     }
 
     //  State of comment(run/pause)
