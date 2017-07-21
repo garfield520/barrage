@@ -25,9 +25,10 @@
             window.webkitRequestAnimationFrame ||
             window.mozRequestAnimationFrame ||
             window.oRequestAnimationFrame ||
-            // if all else fails, use setTimeout
+            // If all else fails, use setTimeout.
             function (callback) {
-                return window.setTimeout(callback, 1000 / 60); // shoot for 60 fps
+                // Shoot for 60 fps
+                return window.setTimeout(callback, 1000 / 60);
             };
     })();
 
@@ -309,6 +310,11 @@
         }
 
         CommentManager.prototype.resize = function () {
+
+        }
+
+        //  Destory the comment manager.
+        CommentManager.prototype.destory = function () {
 
         }
 
