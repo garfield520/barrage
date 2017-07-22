@@ -217,25 +217,27 @@
         CommentManager.prototype.isPaused = false;
 
         CommentManager.prototype.pause = function () {
-            console.log('pause');
-            this.isPaused = true;
-            //  Handle time of top comment
-            if ( this.top_bottom_comment.top && this.top_bottom_comment.top.length != 0 ) {
-                var currentTime = new Date().getTime();
-                var topDurantion = this.fSettings.duration_top;
-                this.top_bottom_comment.top.map(function ( comment, index ) {
-                    //  Clear comment time out timer
-                    clearTimeout(comment.timer);
-                    //  Recode remaining time of comment
-                    comment.remainTime = topDurantion * 1000 - ((currentTime - comment.currentTime));
-                });
-            }
-            //  Handle pause event of scroll comment
-            if ( !this.isPaused && this.commentArray.length != 0 ) {
-                this.commentArray.map(function ( comment, index ) {
-                    cancelrAF(comment.timerId);
-                });
-            }
+            this.isPaused || (function () {
+                console.log('pause');
+                //  Handle time of top comment
+                if ( this.top_bottom_comment.top && this.top_bottom_comment.top.length != 0 ) {
+                    var currentTime = new Date().getTime();
+                    var topDurantion = this.fSettings.duration_top;
+                    this.top_bottom_comment.top.map(function ( comment, index ) {
+                        //  Clear comment time out timer
+                        clearTimeout(comment.timer);
+                        //  Recode remaining time of comment
+                        comment.remainTime = topDurantion * 1000 - ((currentTime - comment.currentTime));
+                    });
+                }
+                //  Handle pause event of scroll comment
+                if ( !this.isPaused && this.commentArray.length != 0 ) {
+                    this.commentArray.map(function ( comment, index ) {
+                        cancelrAF(comment.timerId);
+                    });
+                }
+                this.isPaused = true;
+            }).call( this );
         }
 
         CommentManager.prototype.resume = function () {
@@ -254,7 +256,6 @@
                 }
                 this.commentArray.map(function ( comment, index ) {
                     comment.totalTime = comment.totalTime - comment.passedTime;
-                    
                     animate(comment, comment.endPosition, {
                         duration: comment.totalTime,
                         progress: function ( _passedTime, _passedDistance ) {
@@ -270,17 +271,15 @@
         }
 
         CommentManager.prototype.setOpacity = function ( opacity ) {
-            //  Opacity of comment exists
-            this.commentArray.map(function ( comment, index ) {
-                comment.style.opacity = opacity;
-            });
-            //  Top comment
-            this.top_bottom_comment.top.map(function ( comment ) {
-                comment.style.opacity = opacity;
-            });
-            //  Bottom comment
-            this.top_bottom_comment.bottom.map(function ( comment ) {
-                comment.style.opacity = opacity;
+            //  Handle opacity of comment
+            [
+                this.commentArray,
+                this.top_bottom_comment.top,
+                this.top_bottom_comment.bottom
+            ].map(function ( cmtArr ) {
+                cmtArr.map(function ( comment ) {
+                    comment.style.opacity = opacity;
+                });
             });
             //  Opacity of comment to be append later
             this.fSettings.opacity = opacity;
