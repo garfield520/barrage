@@ -19,6 +19,10 @@
             define(factory) :
             (global.cm = factory());
 })( this, function () {
+    function extend () {
+        
+    }
+
     var rAF = (function () {
         return window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
