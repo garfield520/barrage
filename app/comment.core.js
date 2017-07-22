@@ -20,8 +20,7 @@
             (global.cm = factory());
 })( this, function () {
     var rAF = (function () {
-        return
-            window.requestAnimationFrame ||
+        return window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
             window.mozRequestAnimationFrame ||
             window.oRequestAnimationFrame ||
@@ -33,8 +32,7 @@
     })();
 
     var cancelrAF = (function () {
-        return
-            window.cancelAnimationFrame ||
+        return window.cancelAnimationFrame ||
             window.webkitCancelAnimationFrame ||
             window.mozCancelAnimationFrame ||
             window.oCancelAnimationFrame ||
@@ -203,20 +201,39 @@
                 });
             } else if ( position === 'top' ) {
                 this.top_bottom_comment.top.push( comment );
-                setTimeout(function () {
-                    _this.commentBox.removeChild(comment);
-                    _this.top_bottom_comment.top.shift();
+                comment.currentTime = new Date().getTime();
+                comment.timer = setTimeout(function () {
+                    // _this.commentBox.removeChild(comment);
+                    // _this.top_bottom_comment.top.shift();
+                    _this._removeTopComment(_this, comment);
                 }, _this.fSettings.duration_top * 1000);
             }
+        }
+
+        CommentManager.prototype._removeTopComment = function ( _this, comment ) {
+            _this.commentBox.removeChild(comment);
+            _this.top_bottom_comment.top.shift();
         }
 
         //  State of comment(run/pause)
         CommentManager.prototype.isPaused = false;
 
         CommentManager.prototype.pause = function () {
+            console.log('pause');
+            this.isPaused = true;
+            //  Handle time of top comment
+            if ( this.top_bottom_comment.top && this.top_bottom_comment.top.length != 0 ) {
+                var currentTime = new Date().getTime();
+                var topDurantion = this.fSettings.duration_top;
+                this.top_bottom_comment.top.map(function ( comment, index ) {
+                    //  Clear comment time out timer
+                    clearTimeout(comment.timer);
+                    //  Recode remaining time of comment
+                    comment.remainTime = topDurantion * 1000 - ((currentTime - comment.currentTime));
+                });
+            }
+            //  Handle pause event of scroll comment
             if ( !this.isPaused && this.commentArray.length != 0 ) {
-                console.log('pause');
-                this.isPaused = true;
                 this.commentArray.map(function ( comment, index ) {
                     cancelrAF(comment.timerId);
                 });
@@ -226,8 +243,17 @@
         CommentManager.prototype.resume = function () {
             var _this = this;
             if ( this.isPaused ) {
-                console.log('resume');
                 this.isPaused = false;
+                console.log('resume');
+                //  Resume top comment time out
+                if ( this.top_bottom_comment.top && this.top_bottom_comment.top.length != 0 ) {
+                    this.top_bottom_comment.top.map(function ( comment, index ) {
+                        //  Remaining time of current comment
+                        comment.timer = setTimeout(function () {
+                            _this._removeTopComment(_this, comment);
+                        }, comment.remainTime);
+                    });
+                }
                 this.commentArray.map(function ( comment, index ) {
                     comment.totalTime = comment.totalTime - comment.passedTime;
                     
@@ -320,7 +346,7 @@
 
         return CommentManager;
     })();
-
+    window.CommentManager = CommentManager;
     return CommentManager;
 });
 
