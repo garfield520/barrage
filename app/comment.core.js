@@ -203,8 +203,6 @@
                 this.top_bottom_comment.top.push( comment );
                 comment.currentTime = new Date().getTime();
                 comment.timer = setTimeout(function () {
-                    // _this.commentBox.removeChild(comment);
-                    // _this.top_bottom_comment.top.shift();
                     _this._removeTopComment(_this, comment);
                 }, _this.fSettings.duration_top * 1000);
             }
