@@ -91,7 +91,7 @@
                 currentPosition += step;
                 passedDistance += step;
                 passedTime = t - startTime;
-                elem.style.transform = 'translateX(' + currentPosition +'px)';
+                elem.style.transform = 'translateX(' + currentPosition + 'px)';
 
                 if ( config.progress ) {
                     config.progress( passedTime );
@@ -101,7 +101,7 @@
                     elem.timerId = rAF(_loop)
                 } else {
                     currentPosition = totalDistance;
-                    elem.style.transform = 'translateX(' + toDestance +'px)';
+                    elem.style.transform = 'translateX(' + toDestance + 'px)';
                     config.complete && config.complete();
                 }
             }
