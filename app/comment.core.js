@@ -26,6 +26,10 @@
         }
     }
 
+    function isObject ( obj ) {
+        return Object.prototype.toString.call( obj ) === '[object Object]';
+    }
+
     var rAF = (function () {
         return window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
@@ -48,10 +52,12 @@
             };
     })();
 
-    function isObject ( obj ) {
-        return Object.prototype.toString.call( obj ) === '[object Object]';
-    }
-
+    /**
+     * Core animation engine
+     * @param {Node} elem 
+     * @param {Number} toDestance 
+     * @param {JS Object} config 
+     */
     function animate ( elem, toDestance, config ) {
         var isFirstTime     = true,
             totalTime       = config.duration,
