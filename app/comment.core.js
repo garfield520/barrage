@@ -19,8 +19,10 @@
             define(factory) :
             (global.cm = factory());
 })( this, function () {
-    function extend () {
-        
+    function _extend (obj1, obj2) {
+        for ( var attr in obj2 ) {
+            obj1[attr] = obj2[attr];
+        }
     }
 
     var rAF = (function () {
@@ -244,6 +246,7 @@
             }).call( this );
         }
 
+        //  Resume comment
         CommentManager.prototype.resume = function () {
             var _this = this;
             if ( this.isPaused ) {
@@ -309,25 +312,31 @@
                 comment.style.opacity = this.fSettings.opacity;
             }
             comment.innerText = comment_config.text;
-            comment.style.color = comment_config.color;
-            comment.style.fontSize = comment_config.fontSize + 'px';
-            comment.style.fontWeight = 'bold';
-            comment.style.fontFamily = 'SimHei, "Microsoft JhengHei", Arial, Helvetica, sans-serif';
-            comment.style.textShadow = 'rgb(0, 0, 0) 1px 0px 1px, rgb(0, 0, 0) 0px 1px 1px, rgb(0, 0, 0) 0px -1px 1px, rgb(0, 0, 0) -1px 0px 1px';
-            comment.style.whiteSpace = 'nowrap';
+            _extend(comment.style, {
+                color: comment_config.color,
+                fontSize: comment_config.fontSize + 'px',
+                fontWeight: 'bold',
+                fontFamily: 'SimHei, "Microsoft JhengHei", Arial, Helvetica, sans-serif',
+                textShadow: 'rgb(0, 0, 0) 1px 0px 1px, rgb(0, 0, 0) 0px 1px 1px, rgb(0, 0, 0) 0px -1px 1px, rgb(0, 0, 0) -1px 0px 1px0',
+                whiteSpace: 'nowrap'
+            });
 
             //  Scroll comment
             if ( !comment_config.position || comment_config.position === 'scroll' ) {
                 position = '';
-                comment.style.display = 'inline-block';
-                comment.style.position = 'absolute';
-                comment.style.left = this.fSettings.comment_width + 'px';
-                comment.style.top = this.fSettings.fontSize * Math.round(this.rows * Math.random()) + 'px';
+                _extend(comment.style, {
+                    display: 'inline-block',
+                    position: 'absolute',
+                    left: this.fSettings.comment_width + 'px',
+                    top: this.fSettings.fontSize * Math.round(this.rows * Math.random()) + 'px'
+                });
             } else if ( comment_config.position === 'top' ) {
                 position = 'top';
-                comment.style.display = 'block';
-                comment.style.width = '100%';
-                comment.style.textAlign = 'center';
+                _extend(comment.style, {
+                    display: 'block',
+                    width: '100%',
+                    textAlign: 'center'
+                });
             }
 
             return {
