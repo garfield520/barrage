@@ -148,9 +148,12 @@
                 duration: 5,
                 duration_top: 3
             }
+
+            //  Set default container as comment box if there is no user config
             if ( options.container ) {
                 options.container = document.getElementById(options.container);
             }
+            
             //  IE8+
             Object.assign(default_settings, options);
             //  real settings of Comment
