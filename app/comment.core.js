@@ -10,6 +10,7 @@
  * 3、清除
  * 4、遮罩点击事件
  * 5、继续
+ * 6、顶部弹幕
  */
 
 (function ( global, factory ) {
@@ -19,9 +20,18 @@
             define(factory) :
             (global.cm = factory());
 })( this, function () {
+    function _extend (obj1, obj2) {
+        for ( var attr in obj2 ) {
+            obj1[attr] = obj2[attr];
+        }
+    }
+
+    function isObject ( obj ) {
+        return Object.prototype.toString.call( obj ) === '[object Object]';
+    }
+
     var rAF = (function () {
-        return
-            window.requestAnimationFrame ||
+        return window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
             window.mozRequestAnimationFrame ||
             window.oRequestAnimationFrame ||
@@ -33,8 +43,7 @@
     })();
 
     var cancelrAF = (function () {
-        return
-            window.cancelAnimationFrame ||
+        return window.cancelAnimationFrame ||
             window.webkitCancelAnimationFrame ||
             window.mozCancelAnimationFrame ||
             window.oCancelAnimationFrame ||
@@ -43,10 +52,12 @@
             };
     })();
 
-    function isObject ( obj ) {
-        return Object.prototype.toString.call( obj ) === '[object Object]';
-    }
-
+    /**
+     * Core animation engine
+     * @param {Node} elem 
+     * @param {Number} toDestance 
+     * @param {JS Object} config 
+     */
     function animate ( elem, toDestance, config ) {
         var isFirstTime     = true,
             totalTime       = config.duration,
@@ -87,7 +98,7 @@
                 currentPosition += step;
                 passedDistance += step;
                 passedTime = t - startTime;
-                elem.style.transform = 'translateX(' + currentPosition +'px)';
+                elem.style.transform = 'translateX(' + currentPosition + 'px)';
 
                 if ( config.progress ) {
                     config.progress( passedTime );
@@ -97,7 +108,7 @@
                     elem.timerId = rAF(_loop)
                 } else {
                     currentPosition = totalDistance;
-                    elem.style.transform = 'translateX(' + toDestance +'px)';
+                    elem.style.transform = 'translateX(' + toDestance + 'px)';
                     config.complete && config.complete();
                 }
             }
@@ -137,9 +148,12 @@
                 duration: 5,
                 duration_top: 3
             }
+
+            //  Set default container as comment box if there is no user config
             if ( options.container ) {
                 options.container = document.getElementById(options.container);
             }
+            
             //  IE8+
             Object.assign(default_settings, options);
             //  real settings of Comment
@@ -203,34 +217,62 @@
                 });
             } else if ( position === 'top' ) {
                 this.top_bottom_comment.top.push( comment );
-                setTimeout(function () {
-                    _this.commentBox.removeChild(comment);
-                    _this.top_bottom_comment.top.shift();
+                comment.currentTime = new Date().getTime();
+                comment.timer = setTimeout(function () {
+                    _this._removeTopComment(_this, comment);
                 }, _this.fSettings.duration_top * 1000);
             }
+        }
+
+        CommentManager.prototype._removeTopComment = function ( _this, comment ) {
+            _this.commentBox.removeChild(comment);
+            _this.top_bottom_comment.top.shift();
         }
 
         //  State of comment(run/pause)
         CommentManager.prototype.isPaused = false;
 
         CommentManager.prototype.pause = function () {
-            if ( !this.isPaused && this.commentArray.length != 0 ) {
+            this.isPaused || (function () {
                 console.log('pause');
+                //  Handle time of top comment
+                if ( this.top_bottom_comment.top && this.top_bottom_comment.top.length != 0 ) {
+                    var currentTime = new Date().getTime();
+                    var topDurantion = this.fSettings.duration_top;
+                    this.top_bottom_comment.top.map(function ( comment, index ) {
+                        //  Clear comment time out timer
+                        clearTimeout(comment.timer);
+                        //  Recode remaining time of comment
+                        comment.remainTime = topDurantion * 1000 - ((currentTime - comment.currentTime));
+                    });
+                }
+                //  Handle pause event of scroll comment
+                if ( !this.isPaused && this.commentArray.length != 0 ) {
+                    this.commentArray.map(function ( comment, index ) {
+                        cancelrAF(comment.timerId);
+                    });
+                }
                 this.isPaused = true;
-                this.commentArray.map(function ( comment, index ) {
-                    cancelrAF(comment.timerId);
-                });
-            }
+            }).call( this );
         }
 
+        //  Resume comment
         CommentManager.prototype.resume = function () {
             var _this = this;
             if ( this.isPaused ) {
-                console.log('resume');
                 this.isPaused = false;
+                console.log('resume');
+                //  Resume top comment time out
+                if ( this.top_bottom_comment.top && this.top_bottom_comment.top.length != 0 ) {
+                    this.top_bottom_comment.top.map(function ( comment, index ) {
+                        //  Remaining time of current comment
+                        comment.timer = setTimeout(function () {
+                            _this._removeTopComment(_this, comment);
+                        }, comment.remainTime);
+                    });
+                }
                 this.commentArray.map(function ( comment, index ) {
                     comment.totalTime = comment.totalTime - comment.passedTime;
-                    
                     animate(comment, comment.endPosition, {
                         duration: comment.totalTime,
                         progress: function ( _passedTime, _passedDistance ) {
@@ -246,17 +288,15 @@
         }
 
         CommentManager.prototype.setOpacity = function ( opacity ) {
-            //  Opacity of comment exists
-            this.commentArray.map(function ( comment, index ) {
-                comment.style.opacity = opacity;
-            });
-            //  Top comment
-            this.top_bottom_comment.top.map(function ( comment ) {
-                comment.style.opacity = opacity;
-            });
-            //  Bottom comment
-            this.top_bottom_comment.bottom.map(function ( comment ) {
-                comment.style.opacity = opacity;
+            //  Handle opacity of comment
+            [
+                this.commentArray,
+                this.top_bottom_comment.top,
+                this.top_bottom_comment.bottom
+            ].map(function ( cmtArr ) {
+                cmtArr.map(function ( comment ) {
+                    comment.style.opacity = opacity;
+                });
             });
             //  Opacity of comment to be append later
             this.fSettings.opacity = opacity;
@@ -282,25 +322,31 @@
                 comment.style.opacity = this.fSettings.opacity;
             }
             comment.innerText = comment_config.text;
-            comment.style.color = comment_config.color;
-            comment.style.fontSize = comment_config.fontSize + 'px';
-            comment.style.fontWeight = 'bold';
-            comment.style.fontFamily = 'SimHei, "Microsoft JhengHei", Arial, Helvetica, sans-serif';
-            comment.style.textShadow = 'rgb(0, 0, 0) 1px 0px 1px, rgb(0, 0, 0) 0px 1px 1px, rgb(0, 0, 0) 0px -1px 1px, rgb(0, 0, 0) -1px 0px 1px';
-            comment.style.whiteSpace = 'nowrap';
+            _extend(comment.style, {
+                color: comment_config.color,
+                fontSize: comment_config.fontSize + 'px',
+                fontWeight: 'bold',
+                fontFamily: 'SimHei, "Microsoft JhengHei", Arial, Helvetica, sans-serif',
+                textShadow: 'rgb(0, 0, 0) 1px 0px 1px, rgb(0, 0, 0) 0px 1px 1px, rgb(0, 0, 0) 0px -1px 1px, rgb(0, 0, 0) -1px 0px 1px0',
+                whiteSpace: 'nowrap'
+            });
 
             //  Scroll comment
             if ( !comment_config.position || comment_config.position === 'scroll' ) {
                 position = '';
-                comment.style.display = 'inline-block';
-                comment.style.position = 'absolute';
-                comment.style.left = this.fSettings.comment_width + 'px';
-                comment.style.top = this.fSettings.fontSize * Math.round(this.rows * Math.random()) + 'px';
+                _extend(comment.style, {
+                    display: 'inline-block',
+                    position: 'absolute',
+                    left: this.fSettings.comment_width + 'px',
+                    top: this.fSettings.fontSize * Math.round(this.rows * Math.random()) + 'px'
+                });
             } else if ( comment_config.position === 'top' ) {
                 position = 'top';
-                comment.style.display = 'block';
-                comment.style.width = '100%';
-                comment.style.textAlign = 'center';
+                _extend(comment.style, {
+                    display: 'block',
+                    width: '100%',
+                    textAlign: 'center'
+                });
             }
 
             return {
@@ -320,7 +366,7 @@
 
         return CommentManager;
     })();
-
+    window.CommentManager = CommentManager;
     return CommentManager;
 });
 
