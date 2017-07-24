@@ -1,6 +1,6 @@
 /**
  * comment.core.js
- * create on 2017-7-10
+ * Create on 2017-7-10
  * version 0.0.2
  */
 
