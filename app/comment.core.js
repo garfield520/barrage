@@ -154,7 +154,7 @@
                 options.container = document.getElementById(options.container);
             }
             
-            //  IE8+
+            //  Support IE8+
             Object.assign(default_settings, options);
             //  real settings of Comment
             var fSettings = default_settings;
