@@ -364,6 +364,12 @@
 
         }
 
+        CommentManager.prototype.cmtEvent = function ( eventName, callback ) {
+            this.commentBox.addEventListener(eventName, function ( e ) {
+                callback( e );
+            });
+        }
+
         return CommentManager;
     })();
     window.CommentManager = CommentManager;
