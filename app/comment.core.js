@@ -305,11 +305,7 @@
         CommentManager.prototype.clear = function () {
             console.log( this.commentArray )
         }
-
-        CommentManager.prototype.setComment = function () {
-            
-        }
-
+        
         CommentManager.prototype._newComment = function ( comment_config ) {
             var position;
 
