@@ -303,7 +303,7 @@
         }
 
         CommentManager.prototype.clear = function () {
-            console.log( this.commentArray )
+            
         }
         
         CommentManager.prototype._newComment = function ( comment_config ) {
