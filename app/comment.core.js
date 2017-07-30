@@ -234,7 +234,6 @@
 
         CommentManager.prototype.pause = function () {
             this.isPaused || (function () {
-                console.log('pause');
                 //  Handle time of top comment
                 if ( this.top_bottom_comment.top && this.top_bottom_comment.top.length != 0 ) {
                     var currentTime = new Date().getTime();
@@ -261,7 +260,6 @@
             var _this = this;
             if ( this.isPaused ) {
                 this.isPaused = false;
-                console.log('resume');
                 //  Resume top comment time out
                 if ( this.top_bottom_comment.top && this.top_bottom_comment.top.length != 0 ) {
                     this.top_bottom_comment.top.map(function ( comment, index ) {
