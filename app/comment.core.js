@@ -301,7 +301,11 @@
         }
 
         CommentManager.prototype.clear = function () {
-            
+            //  Clear all comments in screen.
+            this.commentArray = [];
+            this.top_bottom_comment.top = [];
+            this.top_bottom_comment.bottom = [];
+            this.commentBox.innerHTML = '';
         }
         
         CommentManager.prototype._newComment = function ( comment_config ) {
