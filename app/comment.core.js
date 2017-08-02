@@ -123,7 +123,7 @@
              * Judge if the options is a JS object, to call init function or throw Error
              */
             if ( isObject(options) ) {
-                if ( !options.comment_top || !options.comment_left || !options.comment_width || !options.comment_height ) {
+                if ( options.comment_top === undefined || options.comment_left === undefined || !options.comment_width || !options.comment_height ) {
                     throw new Error('The position infomation of CommentBox must be transferd')
                 } else {
                     this.init( options );
@@ -173,7 +173,7 @@
                 top: fSettings.comment_top + 'px',
                 background: '#000',
                 overflow: 'hidden',
-                zIndex: '1'
+                zIndex: '99999999'
             });
             /**
              * Append comment box to container
