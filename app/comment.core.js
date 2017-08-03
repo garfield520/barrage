@@ -171,7 +171,7 @@
                 height: fSettings.comment_height + 'px',
                 left: fSettings.comment_left + 'px',
                 top: fSettings.comment_top + 'px',
-                background: '#000',
+                background: 'transparent',
                 overflow: 'hidden',
                 zIndex: '99999999'
             });
