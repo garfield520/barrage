@@ -123,7 +123,7 @@
              * Judge if the options is a JS object, to call init function or throw Error
              */
             if ( isObject(options) ) {
-                if ( !options.comment_top || !options.comment_left || !options.comment_width || !options.comment_height ) {
+                if ( options.comment_top === undefined || options.comment_left === undefined || !options.comment_width || !options.comment_height ) {
                     throw new Error('The position infomation of CommentBox must be transferd')
                 } else {
                     this.init( options );
@@ -171,9 +171,9 @@
                 height: fSettings.comment_height + 'px',
                 left: fSettings.comment_left + 'px',
                 top: fSettings.comment_top + 'px',
-                background: '#000',
+                background: 'transparent',
                 overflow: 'hidden',
-                zIndex: '1'
+                zIndex: '99999999'
             });
             /**
              * Append comment box to container
@@ -234,7 +234,6 @@
 
         CommentManager.prototype.pause = function () {
             this.isPaused || (function () {
-                console.log('pause');
                 //  Handle time of top comment
                 if ( this.top_bottom_comment.top && this.top_bottom_comment.top.length != 0 ) {
                     var currentTime = new Date().getTime();
@@ -261,7 +260,6 @@
             var _this = this;
             if ( this.isPaused ) {
                 this.isPaused = false;
-                console.log('resume');
                 //  Resume top comment time out
                 if ( this.top_bottom_comment.top && this.top_bottom_comment.top.length != 0 ) {
                     this.top_bottom_comment.top.map(function ( comment, index ) {
@@ -303,7 +301,11 @@
         }
 
         CommentManager.prototype.clear = function () {
-            
+            //  Clear all comments in screen.
+            this.commentArray = [];
+            this.top_bottom_comment.top = [];
+            this.top_bottom_comment.bottom = [];
+            this.commentBox.innerHTML = '';
         }
         
         CommentManager.prototype._newComment = function ( comment_config ) {
