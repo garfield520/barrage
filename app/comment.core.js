@@ -370,7 +370,9 @@
 
         return CommentManager;
     })();
+
     window.CommentManager = CommentManager;
+    
     return CommentManager;
 });
 
