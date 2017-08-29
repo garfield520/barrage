@@ -353,9 +353,7 @@
             }
         }
 
-        CommentManager.prototype.resize = function () {
-
-        }
+        CommentManager.prototype.resize = function () {}
 
         //  Destory the comment manager.
         CommentManager.prototype.destory = function () {
