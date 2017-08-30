@@ -175,6 +175,7 @@
                 overflow: 'hidden',
                 zIndex: '99999999'
             });
+            
             /**
              * Append comment box to container
              * Default - document.body
