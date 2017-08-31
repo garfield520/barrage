@@ -347,7 +347,7 @@
                     textAlign: 'center'
                 });
             }
-
+            
             return {
                 comment: comment,
                 position: position
