@@ -29,9 +29,6 @@
     function isObject ( obj ) {
         return Object.prototype.toString.call( obj ) === '[object Object]';
     }
-
-
-    
     
     var rAF = (function () {
         return window.requestAnimationFrame ||
