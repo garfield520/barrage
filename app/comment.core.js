@@ -2,9 +2,8 @@
  * comment.core.js
  * Create on 2017-7-10
  * version 0.0.2
- */
-
-/**
+ * 
+ * 功能：
  * 1、暂停
  * 2、透明度
  * 3、清除
