@@ -18,6 +18,7 @@
             typeof define === 'function' && define.amd ?
             define(factory) :
             (global.cm = factory());
+            
 })( this, function () {
     function _extend (obj1, obj2) {
         for ( var attr in obj2 ) {
