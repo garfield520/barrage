@@ -7,6 +7,7 @@ const app = express();
 
 app.use(express.static('./app'));
 
+//	this is use for test
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
